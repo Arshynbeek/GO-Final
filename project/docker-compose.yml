@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+  final_db:
+    container_name: final_db
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=admin
+    image: postgres:alpine3.19
+
+
+
+# version: "3.7"
+
+# services:
+#   final_db:
+#     container_name: final_db
+#     ports:
+#       - "5432:5432"
+#     environment:
+#       POSTGRES_PASSWORD: root
+#       POSTGRES_USER: admin
+#     image: postgres:alpine
+#     volumes:
+#       - db_data:/var/lib/postgresql/data
+
+#   myapp:
+#     build:
+#       context: .
+#       dockerfile: deployments/docker/Dockerfile
+#     ports:
+#       - "8080:8080"
+#     environment:
+#       DB_HOST: final_db
+#       DB_PORT: 5432
+#       DB_USER: admin
+#       DB_PASSWORD: root
+#       DB_NAME: mydatabase
+#     depends_on:
+#       - final_db
+
+# volumes:
+#   db_data:

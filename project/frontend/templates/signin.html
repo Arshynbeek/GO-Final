@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ .title }}</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Sign In</h1>
+      <form id="signinForm" action="/api/v1/signin" method="POST">
+        <label for="Username">Username:</label>
+        <input type="text" id="Username" name="Username" required />
+    
+        <label for="Password">Password:</label>
+        <input type="password" id="Password" name="Password" required />
+    
+        <button type="submit">Sign In</button>
+    </form>
+    </div>
+  </body>
+</html>
