@@ -1,64 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .title }}</title>
 
-    <link rel="stylesheet" href="/static/main.css" />
-    <link rel="stylesheet" href="/static/styles/pages/home.css" />
+    <link rel="stylesheet" href="/static/main.css">
+    <link rel="stylesheet" href="/static/styles/pages/home.css">
   </head>
 
   <body>
+
+    <nav>
+      <ul>
+        <li>
+          <ul>
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="/">
+                <button>
+                  <img src="/static/images/icons/home_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/bell_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <ul>
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/info_information_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/settings_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              {{ if .user.ID }}
+                <a href="/profile/{{ .user.ID }}">
+                  <button>
+                    <img src="/static/images/icons/user_icon.svg" alt="">
+                  </button>
+                </a>
+              {{ else }}
+                <a href="/signin/">
+                  <button>
+                    <img src="/static/images/icons/log_in_icon.svg" alt="">
+                  </button>
+                </a>
+              {{ end }}
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
     <div class="container">
-      <h1>{{ .title }}</h1>
-      <h1>{{ .user.Name }}</h1>
-
-      {{ range .categories }}
-        <strong>{{ .Name }}</strong>
-      {{ end }}
-
-      <div class="example">
+      <div class="carousel">
         {{ range $food := .foods }}
           <div class="food">
             <div class="image">
-              {{ range $pic := $food.Pictures }}
-                <img src="{{ $pic }}" alt="Food image" />
+              {{ range $picture := $food.Pictures }}
+                <img src="{{ $picture }}" alt="Food image" />
               {{ end }}
             </div>
-
-            <h2>{{ $food.Name }}</h2>
-            <p>{{ $food.Description }}</p>
-            <p>Quantity: <strong>{{ $food.Quantity }}</strong></p>
-
-            {{ range $.categories }}
-              {{ if eq .ID $food.CategoryID }}
-                <strong>{{ .Name }}</strong>
+      
+            <div class="content">
+              {{ range $.categories }}
+                {{ if eq .ID $food.CategoryID }}
+                  <strong>{{ .Name }}</strong>
+                {{ end }}
               {{ end }}
-            {{ end }}
 
-            <a href="/api/v1/add/">
-              <button>Add to cart</button>
-            </a>
+              <h4>{{ $food.Name }}</h4>
+      
+              <a href="/api/v1/add/">
+                <button class="button">Add to cart</button>
+              </a>
+            </div>
           </div>
         {{ end }}
       </div>
 
-      <a href="/signup/">
-        <button>Sign Up</button>
-      </a>
+      {{ range $category := .categories }}
+        <div class="products-block">
+          <h2>{{ $category.Name }}</h2>
+          <div class="products">
+            {{ range $food := $.foods }}
+              {{ if eq $food.CategoryID $category.ID }}
+                <div class="card">
+                  <div class="card-img">
+                    {{ range $picture := $food.Pictures }}
+                      <img src="{{ $picture }}" alt="Drink image">
+                      <span>
+                        <img src="/static/images/icons/tag_icon.svg" alt="">
+                        {{ $food.Price }}₸.
+                      </span>
+                    {{ end }}
+                  </div>
 
-      <a href="/signin/">
-        <button>Sign In</button>
-      </a>
+                  <div class="card-info">
+                    <div>
+                      <h3>{{ $food.Name }}</h3>
+                      <p>{{ $food.Description }}</p>
+                    </div>
+                    
+                    <div>
+                      <small>Quantity: <strong>{{ $food.Quantity }}</strong></small>
+                      <span>
+                        <a href="/api/v1/add/">
+                          <button class="button">Add to cart</button>
+                        </a>
 
-      <a href="/profile/{{ .user.ID }}">
-        <button>Profile</button>
-      </a>
-
-      <a href="/api/v1/signout/">
-        <button>Sign Out</button>
-      </a>
+                        <a href="/product/{{ $food.ID }}">
+                          more
+                          <img src="/static/images/icons/external_link_icon.svg" alt="">
+                        </a>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              {{ end }}
+            {{ end }}
+          </div>
+        </div>
+      {{ end }}
     </div>
+
+    <script src="/static/script.js"></script>
   </body>
+
 </html>

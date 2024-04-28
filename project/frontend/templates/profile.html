@@ -4,9 +4,159 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
+    
+    <link rel="stylesheet" href="/static/main.css">
+    <link rel="stylesheet" href="/static/styles/pages/profile.css">
   </head>
 
   <body>
-    <h1>{{ .Name }}</h1>
+
+    <nav>
+      <ul>
+        <li>
+          <ul>
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="/">
+                <button>
+                  <img src="/static/images/icons/home_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/bell_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <ul>
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/info_information_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/settings_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              {{ if .user.ID }}
+                <a href="/profile/{{ .user.ID }}">
+                  <button>
+                    <img src="/static/images/icons/user_icon.svg" alt="">
+                  </button>
+                </a>
+              {{ else }}
+                <a href="/signin/">
+                  <button>
+                    <img src="/static/images/icons/log_in_icon.svg" alt="">
+                  </button>
+                </a>
+              {{ end }}
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <div class="info">
+        <div class="user-pfp">
+          {{ if .user.Picture }}
+            <img src="{{ .user.Picture }}" alt="User Picture">
+          {{ else }}
+            <img src="/static/images/icons/camera_off_icon.svg" alt="User Picture">
+          {{ end }}
+        </div>
+
+        <div class="user-info">
+          <p>Name: <strong>{{ .user.Name }}</strong></p>
+          <p>Username: <strong>{{ .user.Username }}</strong></p>
+          <p>Email: <strong>{{ .user.Email }}</strong></p>
+        </div>
+
+        <div class="user-action">
+          <a href="">
+            <button>
+              <img src="/static/images/icons/edit_icon.svg" alt="">
+              <!-- <img src="/static/images/icons/edit_write_pen_icon.svg" alt=""> -->
+              Edit Profile
+            </button>
+          </a>
+
+          <a href="/api/v1/signout/">
+            <button>
+              <img src="/static/images/icons/log_out_icon.svg" alt="">
+              Sign Out
+            </button>
+          </a>
+        </div>
+
+        <div class="notifications">
+          <div class="notify">
+            <img src="/static/images/icons/mail_icon.svg" alt="">
+            <img src="/static/images/icons/message_square_icon.svg" alt="">
+          </div>
+        </div>
+      </div>
+
+      <div class="cart">
+        {{ range $food := $.foods }}
+          <div class="card">
+            <div class="card-img">
+              {{ range $picture := $food.Pictures }}
+                <img src="{{ $picture }}" alt="Drink image">
+                <span>
+                  <img src="/static/images/icons/tag_icon.svg" alt="">
+                  {{ $food.Price }}₸.
+                </span>
+              {{ end }}
+            </div>
+
+            <div class="card-info">
+              <div>
+                <h3>{{ $food.Name }}</h3>
+                <p>{{ $food.Description }}</p>
+              </div>
+              
+              <div>
+                <small>Quantity: <strong>{{ $food.Quantity }}</strong></small>
+                <span>
+                  <a href="/api/v1/add/">
+                    <button class="button">Add to cart</button>
+                  </a>
+
+                  <a href="/product/{{ $food.ID }}">
+                    more
+                    <img src="/static/images/icons/external_link_icon.svg" alt="">
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        {{ end }}
+      </div>
+    </div>
+
   </body>
 </html>

@@ -1,14 +1,12 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"gorm.io/gorm"
 
 	"project/mod/internal/api"
 	"project/mod/internal/structs"
@@ -36,17 +34,13 @@ func Router() *gin.Engine {
 func HomePage(c *gin.Context) {
 	var foods []structs.Food
 	if result := server.DB.Find(&foods); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-			"error": "Error retrieving food items from database.",
-		})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
 		return
 	}
 
 	var categories []structs.Category
 	if result := server.DB.Find(&categories); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-			"error": "Error retrieving category items from database.",
-		})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
 		return
 	}
 
@@ -66,18 +60,23 @@ func HomePage(c *gin.Context) {
 
 func ProductPage(c *gin.Context) {
 	id := c.Param("id")
-
-	var food structs.Food
-	result := server.DB.First(&food, "id = ?", id)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Product not found"})
+	var foods structs.Food
+	if result := server.DB.First(&foods, "id = ?", id); result.Error != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
 		return
-	} else if result.Error != nil {
+	}
+
+	var feedbacks []structs.Feedback
+	if result := server.DB.Find(&feedbacks); result.Error != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
 		return
 	}
 
-	c.HTML(http.StatusOK, "product.html", gin.H{"food": food})
+	c.HTML(http.StatusOK, "product.html", gin.H{
+		"title":     "Product",
+		"foods":     foods,
+		"feedbacks": feedbacks,
+	})
 }
 
 func ProfilePage(c *gin.Context) {
@@ -89,15 +88,28 @@ func ProfilePage(c *gin.Context) {
 	}
 
 	var user structs.User
-	result := server.DB.First(&user, "id = ?", id)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
-		return
-	} else if result.Error != nil {
+	if result := server.DB.First(&user, "id = ?", id); result.Error != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
 		return
 	}
-	c.HTML(http.StatusOK, "profile.html", user)
+
+	var orders []structs.Order
+	if result := server.DB.Find(&orders); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var foods []structs.Food
+	if result := server.DB.Find(&foods); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.HTML(http.StatusOK, "profile.html", gin.H{
+		"user":   user,
+		"orders": orders,
+		"foods":  foods,
+	})
 }
 
 func SignUpPage(c *gin.Context) {

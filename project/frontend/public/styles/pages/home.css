@@ -1,10 +1,61 @@
-.example {
-  padding: 40px 0;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
 
-  > div {
-    border: 1px solid black;
+.carousel {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+.food {
+  position: relative;
+  flex: 0 0 100%;
+  height: 400px;
+  transition: transform 0.5s ease-in-out;
+  border: 1px solid black;
+  border-radius: 10px;
+  overflow: hidden;
+
+  .image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
+
+  .content {
+    min-width: 200px;
+    padding: 16px 20px;
+    position: absolute;
+    bottom: 10%;
+    left: 5%;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 5px -5px 100px black;
+    color: var(--white);
+  
+    button {
+      margin-top: 16px;
+    }
+  }
+}
+
+.products-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.products {
+  display: flex;
+  gap: 20px;
 }
