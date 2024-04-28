@@ -35,6 +35,7 @@ type Food struct {
 	CategoryID  uint        `gorm:"not null"`
 	Name        string      `gorm:"size:255;not null"`
 	Description string      `gorm:"size:255"`
+	Quantity    uint        `gorm:"not null"`
 	Pictures    StringArray `gorm:"type:text[]"`
 	Category    Category    `gorm:"foreignKey:CategoryID"`
 }

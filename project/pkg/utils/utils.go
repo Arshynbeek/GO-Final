@@ -12,7 +12,7 @@ import (
 	"project/mod/internal/structs"
 )
 
-var jwtKey = []byte("arch")
+var KEY = []byte("arch")
 
 func GenerateJWT(userID uint) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -21,7 +21,7 @@ func GenerateJWT(userID uint) (string, error) {
 	claims["user_id"] = userID
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString(KEY)
 	return tokenString, err
 }
 
@@ -74,10 +74,10 @@ func Initialize(db *gorm.DB) {
 	tx.Model(&structs.Food{}).Count(&foodCount)
 	if foodCount == 0 {
 		foods := []structs.Food{
-			{Name: "MacCoffee", Description: "3 in 1 Original is simply a blend of premium coffee beans, non-dairy creamer and sugar.", Pictures: []string{"coffee_image1.jpg", "coffee_image2.jpg"}, CategoryID: 1},
-			{Name: "MacTea", Description: "Instant teas with fruity flavors that everyone enjoys drinking", CategoryID: 1},
-			{Name: "Pocha (Cheese)", Description: "Tender and satisfying appetizer with cheese", Pictures: []string{"pocha_image1.jpg", "pocha_image2.jpg"}, CategoryID: 2},
-			{Name: "Achma", Description: "Round and chocolate snack, which will be the best combination for tea", CategoryID: 2},
+			{Name: "MacCoffee", Description: "3 in 1 Original is simply a blend of premium coffee beans, non-dairy creamer and sugar.", Pictures: []string{"/static/images/maccoffee.jpg"}, Quantity: 10, CategoryID: 1},
+			{Name: "MacTea", Description: "Instant teas with fruity flavors that everyone enjoys drinking", Pictures: []string{"/static/images/mactea.jpg"}, Quantity: 20, CategoryID: 1},
+			{Name: "Pocha (Cheese)", Description: "Tender and satisfying appetizer with cheese", Pictures: []string{"/static/images/pocha.jpg"}, Quantity: 12, CategoryID: 2},
+			{Name: "Achma", Description: "Round and chocolate snack, which will be the best combination for tea", Pictures: []string{"/static/images/achma.jpg"}, Quantity: 4, CategoryID: 2},
 		}
 		if err := tx.Create(&foods).Error; err != nil {
 			tx.Rollback()

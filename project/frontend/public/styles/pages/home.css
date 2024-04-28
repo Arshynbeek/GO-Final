@@ -1,0 +1,10 @@
+.example {
+  padding: 40px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+
+  > div {
+    border: 1px solid black;
+  }
+}

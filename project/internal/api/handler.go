@@ -15,6 +15,7 @@ import (
 func SetupAPIRoutes(router *gin.Engine) {
 	router.POST("/api/v1/signin/", SignIn)
 	router.POST("/api/v1/signup/", SignUp)
+	router.GET("/api/v1/signout/", SignOut)
 }
 
 func SignUp(c *gin.Context) {
@@ -71,6 +72,11 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
+	c.SetCookie("jwt", token, 3600, "/", "", false, true)
+	c.Redirect(http.StatusFound, "/")
+}
+
+func SignOut(c *gin.Context) {
+	c.SetCookie("jwt", "", -1, "/", "", false, true)
 	c.Redirect(http.StatusFound, "/")
 }

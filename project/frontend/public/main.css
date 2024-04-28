@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+@import url("/static/styles/components/card.css");
+
+:root {
+  --primary: #C5ADC5;
+  --secondary: #B2B5E0;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--primary);
+}
+
+h1, h2, h3, h4, h5, h6,
+p, a, li, strong, small,
+button, select, input, option,
+label, div, span {
+  font-family: "Open Sans", sans-serif;
+  text-decoration: none;
+  list-style: none;
+}
+
+.container {
+  max-width: 1400px;
+  width: 100%;
+  margin: 40px auto;
+}

@@ -1,20 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ .title }}</title>
+
+    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/styles/pages/home.css" />
   </head>
 
   <body>
-    <h1>{{ . }}</h1>
+    <div class="container">
+      <h1>{{ .title }}</h1>
+      <h1>{{ .user.Name }}</h1>
 
-    <a href="/signup/">
-      <button>Sign Up</button>
-    </a>
+      {{ range .categories }}
+        <strong>{{ .Name }}</strong>
+      {{ end }}
 
-    <a href="/signin/">
-      <button>Sign In</button>
-    </a>
+      <div class="example">
+        {{ range $food := .foods }}
+          <div class="food">
+            <div class="image">
+              {{ range $pic := $food.Pictures }}
+                <img src="{{ $pic }}" alt="Food image" />
+              {{ end }}
+            </div>
+
+            <h2>{{ $food.Name }}</h2>
+            <p>{{ $food.Description }}</p>
+            <p>Quantity: <strong>{{ $food.Quantity }}</strong></p>
+
+            {{ range $.categories }}
+              {{ if eq .ID $food.CategoryID }}
+                <strong>{{ .Name }}</strong>
+              {{ end }}
+            {{ end }}
+
+            <a href="/api/v1/add/">
+              <button>Add to cart</button>
+            </a>
+          </div>
+        {{ end }}
+      </div>
+
+      <a href="/signup/">
+        <button>Sign Up</button>
+      </a>
+
+      <a href="/signin/">
+        <button>Sign In</button>
+      </a>
+
+      <a href="/profile/{{ .user.ID }}">
+        <button>Profile</button>
+      </a>
+
+      <a href="/api/v1/signout/">
+        <button>Sign Out</button>
+      </a>
+    </div>
   </body>
 </html>
