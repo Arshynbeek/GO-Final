@@ -64,12 +64,14 @@
     align-items: end;
     justify-content: center;
     gap: 10px;
-    background-color: var(--white);
+    background-color: red;
     border-radius: 10px;
+    color: var(--white);
 
     img {
       width: 20px;
       height: 20px;
+      filter: invert(1);
     }
   }
 }

@@ -8,6 +8,7 @@
 
   --white: #FFFFFF;
   --black: #000000;
+  --grey: #F1F1F1;
 }
 
 *, *::before, *::after {

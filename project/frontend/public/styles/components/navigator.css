@@ -25,11 +25,22 @@ nav {
       gap: 10px;
 
       button {
+        position: relative;
         padding: 10px;
 
         img {
           width: 20px;
           height: 20px;
+        }
+
+        .mention {
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          width: 12px;
+          height: 12px;
+          background-color: red;
+          border-radius: 100%;
         }
       }
     }

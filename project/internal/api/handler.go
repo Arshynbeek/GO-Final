@@ -52,17 +52,17 @@ func SignIn(c *gin.Context) {
 	}
 
 	var user structs.User
-	if result := server.DB.Where("username = ?", Credentials.Username).First(&user); result.Error != nil {
+	if result := server.DB.Where("Username = ?", Credentials.Username).First(&user); result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "User Not Found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Credentials.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Invalid credentials"})
 		return
 	}
 

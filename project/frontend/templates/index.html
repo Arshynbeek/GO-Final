@@ -12,6 +12,7 @@
 
   <body>
 
+    {{ $userID := .user.ID }}
     <nav>
       <ul>
         <li>
@@ -35,6 +36,12 @@
             <li>
               <a href="">
                 <button>
+                  {{ range $order := .orders }}
+                    {{ if eq $order.UserID $userID}}
+                      <span class="mention"></span>
+                      {{ break }}
+                    {{ end }}
+                  {{ end }}
                   <img src="/static/images/icons/bell_icon.svg" alt="">
                 </button>
               </a>
@@ -61,8 +68,8 @@
             </li>
 
             <li>
-              {{ if .user.ID }}
-                <a href="/profile/{{ .user.ID }}">
+              {{ if $userID }}
+                <a href="/profile/{{ $userID }}">
                   <button>
                     <img src="/static/images/icons/user_icon.svg" alt="">
                   </button>
@@ -97,7 +104,9 @@
                 {{ end }}
               {{ end }}
 
-              <h4>{{ $food.Name }}</h4>
+              <a href="/product/{{ $food.ID }}">
+                <h4>{{ $food.Name }}</h4>
+              </a>
       
               <a href="/api/v1/add/">
                 <button class="button">Add to cart</button>
@@ -119,7 +128,7 @@
                       <img src="{{ $picture }}" alt="Drink image">
                       <span>
                         <img src="/static/images/icons/tag_icon.svg" alt="">
-                        {{ $food.Price }}₸.
+                        <strong>{{ $food.Price }}₸.</strong>
                       </span>
                     {{ end }}
                   </div>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>{{ .user.Name }}</title>
     
     <link rel="stylesheet" href="/static/main.css">
     <link rel="stylesheet" href="/static/styles/pages/profile.css">
@@ -11,6 +11,7 @@
 
   <body>
 
+    {{ $userID := .user.ID }}
     <nav>
       <ul>
         <li>
@@ -34,6 +35,12 @@
             <li>
               <a href="">
                 <button>
+                  {{ range $order := .orders }}
+                    {{ if eq $order.UserID $userID}}
+                      <span class="mention"></span>
+                      {{ break }}
+                    {{ end }}
+                  {{ end }}
                   <img src="/static/images/icons/bell_icon.svg" alt="">
                 </button>
               </a>
@@ -60,8 +67,8 @@
             </li>
 
             <li>
-              {{ if .user.ID }}
-                <a href="/profile/{{ .user.ID }}">
+              {{ if $userID }}
+                <a href="/profile/{{ $userID }}">
                   <button>
                     <img src="/static/images/icons/user_icon.svg" alt="">
                   </button>
@@ -113,48 +120,86 @@
         </div>
 
         <div class="notifications">
-          <div class="notify">
-            <img src="/static/images/icons/mail_icon.svg" alt="">
-            <img src="/static/images/icons/message_square_icon.svg" alt="">
-          </div>
+          <h2>
+            <img src="/static/images/icons/bell_icon.svg" alt="">
+            Notifications
+          </h2>
+          
+          {{ $notice := false }}
+          {{ range $order := $.orders }}
+            {{ range $food := $.foods }}
+              {{ if eq $food.ID $order.FoodID }}
+                <div class="notify">
+                  <div class="notify-icon">
+                    <img src="/static/images/icons/message_square_icon.svg" alt="">
+                  </div>
+                  
+                  <div>
+                    <h3>Action successful</h3>
+                    <p>{{ $food.Name }} added to cart.</p>
+                  </div>
+                </div>
+                {{ $notice = true }}
+              {{ end }}
+            {{ end }}
+          {{ end }}
+          {{ if not $notice }}
+            <div class="notify">
+              <h3>At the moment you have no notifications.</h3>
+            </div>
+          {{ end }}
         </div>
       </div>
 
-      <div class="cart">
-        {{ range $food := $.foods }}
-          <div class="card">
-            <div class="card-img">
-              {{ range $picture := $food.Pictures }}
-                <img src="{{ $picture }}" alt="Drink image">
-                <span>
-                  <img src="/static/images/icons/tag_icon.svg" alt="">
-                  {{ $food.Price }}₸.
-                </span>
+      <div class="cart-block">
+        <h2>Cart</h2>
+        <div class="cart">
+          {{ $item := false }}
+          {{ range $order := $.orders }}
+            {{ if eq $order.UserID $userID}}
+              {{ range $food := $.foods }}
+                {{ if eq $food.ID $order.FoodID }}
+                  <div class="card">
+                    <div class="card-img">
+                      {{ range $picture := $food.Pictures }}
+                        <img src="{{ $picture }}" alt="Drink image">
+                        <span>
+                          <img src="/static/images/icons/tag_icon.svg" alt="">
+                          <strong>{{ $food.Price }}₸.</strong>
+                        </span>
+                      {{ end }}
+                    </div>
+      
+                    <div class="card-info">
+                      <div>
+                        <h3>{{ $food.Name }}</h3>
+                        <p>{{ $food.Description }}</p>
+                      </div>
+                      
+                      <div>
+                        <small>Quantity: <strong>{{ $food.Quantity }}</strong></small>
+                        <span>
+                          <a href="/api/v1/add/">
+                            <button class="button">Add to cart</button>
+                          </a>
+      
+                          <a href="/product/{{ $food.ID }}">
+                            more
+                            <img src="/static/images/icons/external_link_icon.svg" alt="">
+                          </a>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {{ $item = true }}
+                {{ end }}
               {{ end }}
-            </div>
-
-            <div class="card-info">
-              <div>
-                <h3>{{ $food.Name }}</h3>
-                <p>{{ $food.Description }}</p>
-              </div>
-              
-              <div>
-                <small>Quantity: <strong>{{ $food.Quantity }}</strong></small>
-                <span>
-                  <a href="/api/v1/add/">
-                    <button class="button">Add to cart</button>
-                  </a>
-
-                  <a href="/product/{{ $food.ID }}">
-                    more
-                    <img src="/static/images/icons/external_link_icon.svg" alt="">
-                  </a>
-                </span>
-              </div>
-            </div>
-          </div>
-        {{ end }}
+            {{ end }}
+          {{ end }}
+          {{ if not $item }}
+            <h3>Your cart is empty</h3>
+          {{ end }}
+        </div>
       </div>
     </div>
 

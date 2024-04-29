@@ -20,7 +20,7 @@ func Router() *gin.Engine {
 	router.GET("/", OptionalAuthMiddleware(), HomePage)
 	router.GET("/signin/", SignInPage)
 	router.GET("/signup/", SignUpPage)
-	router.GET("/product/:id", ProductPage)
+	router.GET("/product/:id", OptionalAuthMiddleware(), ProductPage)
 	router.GET("/profile/:id", AuthMiddleware(), ProfilePage)
 
 	router.Static("/static", "../../frontend/public")
@@ -44,6 +44,12 @@ func HomePage(c *gin.Context) {
 		return
 	}
 
+	var orders []structs.Order
+	if result := server.DB.Find(&orders); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
 	user, exists := c.Get("userID")
 	var data structs.User
 	if exists {
@@ -53,6 +59,7 @@ func HomePage(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", gin.H{
 		"title":      "Home",
 		"foods":      foods,
+		"orders":     orders,
 		"categories": categories,
 		"user":       data,
 	})
@@ -60,9 +67,27 @@ func HomePage(c *gin.Context) {
 
 func ProductPage(c *gin.Context) {
 	id := c.Param("id")
-	var foods structs.Food
-	if result := server.DB.First(&foods, "id = ?", id); result.Error != nil {
+	var food structs.Food
+	if result := server.DB.First(&food, "id = ?", id); result.Error != nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var foods []structs.Food
+	if result := server.DB.Find(&foods); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var categories []structs.Category
+	if result := server.DB.Find(&categories); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var orders []structs.Order
+	if result := server.DB.Find(&orders); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
 		return
 	}
 
@@ -72,10 +97,19 @@ func ProductPage(c *gin.Context) {
 		return
 	}
 
+	user, exists := c.Get("userID")
+	var data structs.User
+	if exists {
+		server.DB.First(&data, user)
+	}
+
 	c.HTML(http.StatusOK, "product.html", gin.H{
-		"title":     "Product",
-		"foods":     foods,
-		"feedbacks": feedbacks,
+		"food":       food,
+		"foods":      foods,
+		"categories": categories,
+		"orders":     orders,
+		"feedbacks":  feedbacks,
+		"user":       data,
 	})
 }
 
@@ -133,7 +167,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method")
 			}

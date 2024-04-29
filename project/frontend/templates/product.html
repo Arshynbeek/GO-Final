@@ -3,10 +3,98 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product</title>
+    <title>{{ .food.Name }}</title>
+    
+    <link rel="stylesheet" href="/static/main.css">
+    <link rel="stylesheet" href="/static/styles/pages/product.css">
   </head>
 
   <body>
-    <h1>{{ . }}</h1>
+
+    {{ $userID := .user.ID }}
+    <nav>
+      <ul>
+        <li>
+          <ul>
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="/">
+                <button>
+                  <img src="/static/images/icons/home_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="">
+                <button>
+                  {{ range $order := .orders }}
+                    {{ if eq $order.UserID $userID}}
+                      <span class="mention"></span>
+                      {{ break }}
+                    {{ end }}
+                  {{ end }}
+                  <img src="/static/images/icons/bell_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <ul>
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/info_information_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              <a href="">
+                <button>
+                  <img src="/static/images/icons/settings_icon.svg" alt="">
+                </button>
+              </a>
+            </li>
+
+            <li>
+              {{ if $userID }}
+                <a href="/profile/{{ $userID }}">
+                  <button>
+                    <img src="/static/images/icons/user_icon.svg" alt="">
+                  </button>
+                </a>
+              {{ else }}
+                <a href="/signin/">
+                  <button>
+                    <img src="/static/images/icons/log_in_icon.svg" alt="">
+                  </button>
+                </a>
+              {{ end }}
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <div class="food-img-block">
+        {{ range $images := .food.Pictures }}
+          <div class="food-img">
+            <img src="{{ $images }}" alt="Food Picture" style="width: 100px; height: 200px;">
+          </div>
+        {{ end }}
+      </div>
+    </div>
+
   </body>
 </html>
