@@ -5,9 +5,38 @@
 }
 
 .carousel {
+  position: relative;
   display: flex;
   overflow: hidden;
   width: 100%;
+}
+
+.dots {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s;
+}
+
+.dot {
+  padding: 5px;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 10px;
+  background-color: var(--grey);
+  transition: all 0.3s;
+}
+
+.dot:last-child {
+  margin-right: 0;
+}
+
+.dot.active {
+  padding: 5px 10px;
+  background-color: var(--background);
 }
 
 .food {

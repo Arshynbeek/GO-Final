@@ -92,7 +92,13 @@ func ProductPage(c *gin.Context) {
 	}
 
 	var feedbacks []structs.Feedback
-	if result := server.DB.Find(&feedbacks); result.Error != nil {
+	if result := server.DB.Find(&feedbacks, "food_id = ?", id); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var users []structs.User
+	if result := server.DB.Find(&users, "admin = ?", false); result.Error != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
 		return
 	}
@@ -109,6 +115,7 @@ func ProductPage(c *gin.Context) {
 		"categories": categories,
 		"orders":     orders,
 		"feedbacks":  feedbacks,
+		"users":      users,
 		"user":       data,
 	})
 }

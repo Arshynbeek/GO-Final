@@ -102,7 +102,7 @@ func Initialize(db *gorm.DB) {
 	tx.Model(&structs.Feedback{}).Count(&feedbackCount)
 	if feedbackCount == 0 {
 		feedbacks := []structs.Feedback{
-			{UserID: 2, FoodID: 1, Rating: 5, Comment: "Delicious Mediterranean style roll with chocolate. 😋"},
+			{UserID: 2, FoodID: 4, Rating: 5, Comment: "Delicious Mediterranean style roll with chocolate. 😋"},
 		}
 		if err := tx.Create(&feedbacks).Error; err != nil {
 			tx.Rollback()

@@ -34,7 +34,7 @@
             </li>
 
             <li>
-              <a href="">
+              <a href="/profile/{{ $userID }}">
                 <button>
                   {{ range $order := .orders }}
                     {{ if eq $order.UserID $userID}}
@@ -108,12 +108,30 @@
                 <h4>{{ $food.Name }}</h4>
               </a>
       
-              <a href="/api/v1/add/">
-                <button class="button">Add to cart</button>
-              </a>
+              {{ if $userID }}
+                <a href="/api/v1/add/">
+                  <button class="button">
+                    <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
+                    Add to cart
+                  </button>
+                </a>
+              {{ else }}
+                <a href="/api/v1/add/">
+                  <button class="button" disabled>
+                    <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
+                    Add to cart
+                  </button>
+                </a>
+              {{ end }}
             </div>
           </div>
         {{ end }}
+
+        <div class="dots">
+          {{ range $index, $food := .foods }}
+            <span class="dot" data-index="{{ $index }}"></span>
+          {{ end }}
+        </div>
       </div>
 
       {{ range $category := .categories }}
@@ -142,13 +160,27 @@
                     <div>
                       <small>Quantity: <strong>{{ $food.Quantity }}</strong></small>
                       <span>
-                        <a href="/api/v1/add/">
-                          <button class="button">Add to cart</button>
-                        </a>
+                        {{ if $userID }}
+                          <form action="/api/v1/add/" method="POST">
+                            <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
+                            <input type="hidden" name="FoodID" id="FoodID" value="{{ $food.ID }}">
+                            <button class="button" type="submit">
+                              <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
+                              Add to cart
+                            </button>
+                          </form>
+                        {{ else }}
+                          <button class="button" disabled>
+                            <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
+                            Add to cart
+                          </button>
+                        {{ end }}
 
-                        <a href="/product/{{ $food.ID }}">
+                        <a href="/product/{{ $food.ID }}" class="link">
                           more
                           <img src="/static/images/icons/external_link_icon.svg" alt="">
+                          <!-- <img src="/static/images/icons/link_2_connection_icon.svg" alt=""> -->
+                          <!-- <img src="/static/images/icons/link_connection_icon.svg" alt=""> -->
                         </a>
                       </span>
                     </div>

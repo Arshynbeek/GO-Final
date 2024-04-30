@@ -12,6 +12,7 @@
   <body>
 
     {{ $userID := .user.ID }}
+    {{ $foodID := .food.ID }}
     <nav>
       <ul>
         <li>
@@ -33,7 +34,7 @@
             </li>
 
             <li>
-              <a href="">
+              <a href="/profile/{{ $userID }}">
                 <button>
                   {{ range $order := .orders }}
                     {{ if eq $order.UserID $userID}}
@@ -87,12 +88,63 @@
     </nav>
 
     <div class="container">
-      <div class="food-img-block">
+      <div class="food-view">
         {{ range $images := .food.Pictures }}
           <div class="food-img">
-            <img src="{{ $images }}" alt="Food Picture" style="width: 100px; height: 200px;">
+            <img src="{{ $images }}" alt="{{ $images }}">
           </div>
         {{ end }}
+      </div>
+
+      <div class="food-info">
+        <h2>{{ .food.Name }}</h2>
+        <p>{{ .food.Description }}</p>
+        <small>Quantity: <strong>{{ .food.Quantity }}</strong></small>
+
+        <div class="feedbacks">
+          <h2>
+            <img src="/static/images/icons/send_icon.svg" alt="">
+            Feedback
+          </h2>
+
+          <form action="" method="POST">
+            <input type="range" max="5">
+            <textarea name="Comment" id="Comment"rows="6"></textarea>
+            <button type="submit" class="button">Send Feedback</button>
+          </form>
+
+          <h2>Other Feedbacks</h2>
+
+          {{ $comment := false }}
+          {{ range $feedback := $.feedbacks }}
+            {{ range $user := $.users }}
+              {{ if eq $feedback.FoodID $foodID }}
+                {{ if eq $feedback.UserID $user.ID }}
+                  <div class="feedback">
+                    <div class="user-pfp">
+                      {{ if $user.Picture }}
+                        <img src="{{ $user.Picture }}" alt="User Picture">
+                      {{ else }}
+                        <img src="/static/images/icons/user_icon.svg" alt="User Picture">
+                      {{ end }}
+                    </div>
+
+                    <div>
+                      <h3>{{ $user.Name }}</h3>
+                      <p><strong>{{ $feedback.Rating }}</strong></p>
+                      <p>{{ $feedback.Comment}}</p>
+                    </div>
+                  </div>
+
+                  {{ $comment = true }}
+                {{ end }}
+              {{ end }}
+            {{ end }}
+          {{ end }}
+          {{ if not $comment }}
+            <p>At the moment, there are no feedbacks</p>
+          {{ end }}
+        </div>
       </div>
     </div>
 

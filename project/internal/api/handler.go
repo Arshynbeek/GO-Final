@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -16,6 +17,10 @@ func SetupAPIRoutes(router *gin.Engine) {
 	router.POST("/api/v1/signin/", SignIn)
 	router.POST("/api/v1/signup/", SignUp)
 	router.GET("/api/v1/signout/", SignOut)
+
+	router.POST("/api/v1/buy/", BuyProdct)
+	router.POST("/api/v1/add/", AddProduct)
+	router.POST("/api/v1/remove/", RemoveProduct)
 }
 
 func SignUp(c *gin.Context) {
@@ -80,3 +85,73 @@ func SignOut(c *gin.Context) {
 	c.SetCookie("jwt", "", -1, "/", "", false, true)
 	c.Redirect(http.StatusFound, "/")
 }
+
+func AddProduct(c *gin.Context) {
+	var Values struct {
+		UserID string `form:"UserID"`
+		FoodID string `form:"FoodID"`
+	}
+
+	if err := c.ShouldBind(&Values); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+		return
+	}
+
+	userID, err := strconv.Atoi(Values.UserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error in user id": userID})
+		return
+	}
+
+	foodID, err := strconv.Atoi(Values.FoodID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error in food id": foodID})
+		return
+	}
+
+	order := structs.Order{
+		UserID: uint(userID),
+		FoodID: uint(foodID),
+	}
+
+	if err := server.DB.Create(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add product to cart"})
+		return
+	}
+}
+
+func RemoveProduct(c *gin.Context) {
+	var Values struct {
+		UserID string `form:"UserID"`
+		FoodID string `form:"FoodID"`
+	}
+
+	if err := c.ShouldBind(&Values); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+		return
+	}
+
+	userID, err := strconv.Atoi(Values.UserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error in user id": userID})
+		return
+	}
+
+	foodID, err := strconv.Atoi(Values.FoodID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error in food id": foodID})
+		return
+	}
+
+	order := structs.Order{
+		UserID: uint(userID),
+		FoodID: uint(foodID),
+	}
+
+	if err := server.DB.Where("user_id = ? AND food_id = ?", userID, foodID).Delete(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove product from cart"})
+		return
+	}
+}
+
+func BuyProdct(c *gin.Context) {}

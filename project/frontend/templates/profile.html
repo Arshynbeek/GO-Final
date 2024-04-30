@@ -33,7 +33,7 @@
             </li>
 
             <li>
-              <a href="">
+              <a href="/profile/{{ $userID }}">
                 <button>
                   {{ range $order := .orders }}
                     {{ if eq $order.UserID $userID}}
@@ -104,7 +104,7 @@
 
         <div class="user-action">
           <a href="">
-            <button>
+            <button class="button-neutral">
               <img src="/static/images/icons/edit_icon.svg" alt="">
               <!-- <img src="/static/images/icons/edit_write_pen_icon.svg" alt=""> -->
               Edit Profile
@@ -112,7 +112,7 @@
           </a>
 
           <a href="/api/v1/signout/">
-            <button>
+            <button class="button-negative">
               <img src="/static/images/icons/log_out_icon.svg" alt="">
               Sign Out
             </button>
@@ -179,11 +179,27 @@
                       <div>
                         <small>Quantity: <strong>{{ $food.Quantity }}</strong></small>
                         <span>
-                          <a href="/api/v1/add/">
-                            <button class="button">Add to cart</button>
-                          </a>
+                          <span>
+                            <form action="/api/v1/buy/" method="POST">
+                              <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
+                              <input type="hidden" name="FoodID" id="FoodID" value="{{ $food.ID }}">
+                              <button class="button" type="submit">
+                                <img src="/static/images/icons/box_package_delivery_icon.svg" alt="">
+                                Buy
+                              </button>
+                            </form>
+
+                            <form action="/api/v1/remove/" method="POST">
+                              <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
+                              <input type="hidden" name="FoodID" id="FoodID" value="{{ $food.ID }}">
+                              <button class="button button-neutral" type="submit">
+                                <img src="/static/images/icons/trash_icon.svg" alt="">
+                                Remove
+                              </button>
+                            </form>
+                          </span>
       
-                          <a href="/product/{{ $food.ID }}">
+                          <a href="/product/{{ $food.ID }}" class="link">
                             more
                             <img src="/static/images/icons/external_link_icon.svg" alt="">
                           </a>
