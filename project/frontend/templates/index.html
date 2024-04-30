@@ -109,19 +109,19 @@
               </a>
       
               {{ if $userID }}
-                <a href="/api/v1/add/">
-                  <button class="button">
+                <form action="/api/v1/add/" method="POST">
+                  <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
+                  <input type="hidden" name="FoodID" id="FoodID" value="{{ $food.ID }}">
+                  <button class="button" type="submit">
                     <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
                     Add to cart
                   </button>
-                </a>
+                </form>
               {{ else }}
-                <a href="/api/v1/add/">
-                  <button class="button" disabled>
-                    <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
-                    Add to cart
-                  </button>
-                </a>
+                <button class="button" disabled>
+                  <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
+                  Add to cart
+                </button>
               {{ end }}
             </div>
           </div>

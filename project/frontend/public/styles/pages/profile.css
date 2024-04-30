@@ -17,10 +17,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 
     img {
-      width: 60%;
-      height: 60%;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
   }

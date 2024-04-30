@@ -89,11 +89,7 @@
     <div class="container">
       <div class="info">
         <div class="user-pfp">
-          {{ if .user.Picture }}
-            <img src="{{ .user.Picture }}" alt="User Picture">
-          {{ else }}
-            <img src="/static/images/icons/camera_off_icon.svg" alt="User Picture">
-          {{ end }}
+          <img src="{{ .user.Picture }}" alt="User Picture">
         </div>
 
         <div class="user-info">
@@ -128,18 +124,20 @@
           {{ $notice := false }}
           {{ range $order := $.orders }}
             {{ range $food := $.foods }}
-              {{ if eq $food.ID $order.FoodID }}
-                <div class="notify">
-                  <div class="notify-icon">
-                    <img src="/static/images/icons/message_square_icon.svg" alt="">
+              {{ if eq $order.UserID $userID }}
+                {{ if eq $food.ID $order.FoodID }}
+                  <div class="notify">
+                    <div class="notify-icon">
+                      <img src="/static/images/icons/message_square_icon.svg" alt="">
+                    </div>
+                    
+                    <div>
+                      <h3>Action successful</h3>
+                      <p>{{ $food.Name }} added to cart.</p>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <h3>Action successful</h3>
-                    <p>{{ $food.Name }} added to cart.</p>
-                  </div>
-                </div>
-                {{ $notice = true }}
+                  {{ $notice = true }}
+                {{ end }}
               {{ end }}
             {{ end }}
           {{ end }}

@@ -74,7 +74,7 @@ func Initialize(db *gorm.DB) {
 	tx.Model(&structs.Food{}).Count(&foodCount)
 	if foodCount == 0 {
 		foods := []structs.Food{
-			{Name: "MacCoffee", Description: "3 in 1 Original is simply a blend of premium coffee beans, non-dairy creamer and sugar.", Pictures: []string{"/static/images/products/maccoffee.jpg", "/static/images/products/maccoffee1.jpg", "/static/images/products/maccoffee2.jpg", "/static/images/products/maccoffee.jpg"}, Quantity: 10, Price: 70, CategoryID: 1},
+			{Name: "MacCoffee", Description: "3 in 1 Original is simply a blend of premium coffee beans, non-dairy creamer and sugar.", Pictures: []string{"/static/images/products/maccoffee.jpg", "/static/images/products/table.jpg", "/static/images/products/red.jpg", "/static/images/products/orange.jpg"}, Quantity: 10, Price: 70, CategoryID: 1},
 			{Name: "MacTea", Description: "Instant teas with fruity flavors that everyone enjoys drinking", Pictures: []string{"/static/images/products/mactea.jpg"}, Quantity: 20, Price: 60, CategoryID: 1},
 			{Name: "Pocha (Cheese)", Description: "Tender and satisfying appetizer with cheese", Pictures: []string{"/static/images/products/pocha.jpg"}, Quantity: 12, Price: 250, CategoryID: 2},
 			{Name: "Achma", Description: "Round and chocolate snack, which will be the best combination for tea", Pictures: []string{"/static/images/products/achma.jpg"}, Quantity: 4, Price: 280, CategoryID: 2},

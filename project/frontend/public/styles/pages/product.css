@@ -1,13 +1,10 @@
 .container {
   display: flex;
   gap: 40px;
-
-  > div {
-    border: 1px solid black;
-  }
 }
 
 .food-view {
+  max-width: 700px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(5, 1fr);
@@ -15,37 +12,40 @@
 }
 
 .food-img {
+  max-height: 400px;
+  width: 100%;
+  height: 100%;
   border-radius: 10px;
+  background-color: var(--grey);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   overflow: hidden;
 
   img {
     width: 100%;
-    max-height: 10vh;
+    height: 100%;
     object-fit: cover;
   }
 
   &:nth-child(1) {
     grid-column: 1/-1;
     grid-row: 1/4;
-    background-color: red;
   }
 
   &:nth-child(2) {
     grid-column: 1/2;
     grid-row: 4/6;
-    background-color: green;
   }
 
   &:nth-child(3) {
     grid-column: 2/3;
     grid-row: 4/6;
-    background-color: green;
   }
   
   &:nth-child(4) {
     grid-column: 3/4;
     grid-row: 4/6;
-    background-color: green;
   }
 }
 
@@ -59,9 +59,16 @@
 
     h2 {
       margin-top: 40px;
+      margin-bottom: 0px;
       display: flex;
       align-items: center;
       gap: 6px;
+    }
+
+    h3 {
+      display: flex;
+      gap: 10px;
+      align-items: start;
     }
 
     .feedback {
@@ -86,13 +93,88 @@
 
 form {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
 
-  input, textarea {
+  span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  textarea {
     resize: none;
     width: 100%;
     padding: 8px 12px;
+    margin-bottom: 10px;
     border: 1px solid var(--black);
     border-radius: 8px;
     font-size: 16px;
   }
+}
+
+.rating {
+  display: inline-flex;
+  unicode-bidi: bidi-override;
+  direction: rtl;
+}
+
+.rating > label {
+  display: inline-block;
+  padding: 5px;
+  font-size: 25px;
+}
+
+.rating > input[type="radio"] {
+  display: none;
+}
+
+.rating > label:before {
+  content: "\2605";
+  margin-right: 5px;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.rating > input[type="radio"]:checked ~ label:before,
+.rating:not(:checked) > label:hover ~ label:before {
+  color: gold;
+}
+
+.stars {
+  font-size: 20px;
+  display: inline-flex;
+}
+
+.star {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  color: var(--black);
+}
+.star:before {
+  content: '\2606';
+}
+.stars.stars-1 .star:nth-child(-n + 1) {
+  color: gold;
+}
+.stars.stars-2 .star:nth-child(-n + 2) {
+  color: gold;
+}
+.stars.stars-3 .star:nth-child(-n + 3) {
+  color: gold;
+}
+.stars.stars-4 .star:nth-child(-n + 4) {
+  color: gold;
+}
+.stars.stars-5 .star:nth-child(-n + 5) {
+  color: gold;
+}
+.stars.stars-1 .star:nth-child(-n + 1):before,
+.stars.stars-2 .star:nth-child(-n + 2):before,
+.stars.stars-3 .star:nth-child(-n + 3):before,
+.stars.stars-4 .star:nth-child(-n + 4):before,
+.stars.stars-5 .star:nth-child(-n + 5):before {
+  content: '\2605';
 }

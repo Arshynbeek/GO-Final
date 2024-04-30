@@ -107,9 +107,20 @@
             Feedback
           </h2>
 
-          <form action="" method="POST">
-            <input type="range" max="5">
-            <textarea name="Comment" id="Comment"rows="6"></textarea>
+          <form action="/api/v1/feedback/" method="POST">
+            <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
+            <input type="hidden" name="FoodID" id="FoodID" value="{{ $foodID }}">
+            <span>
+              <h3>Rating: </h3>
+              <div class="rating">
+                <input type="radio" id="star5" name="Rating" value="5" required><label for="star5"></label>
+                <input type="radio" id="star4" name="Rating" value="4"><label for="star4"></label>
+                <input type="radio" id="star3" name="Rating" value="3"><label for="star3"></label>
+                <input type="radio" id="star2" name="Rating" value="2"><label for="star2"></label>
+                <input type="radio" id="star1" name="Rating" value="1"><label for="star1"></label>
+              </div>
+            </span>
+            <textarea name="Comment" id="Comment" rows="6" placeholder="Write Your Comment Here :)" required></textarea>
             <button type="submit" class="button">Send Feedback</button>
           </form>
 
@@ -130,8 +141,16 @@
                     </div>
 
                     <div>
-                      <h3>{{ $user.Name }}</h3>
-                      <p><strong>{{ $feedback.Rating }}</strong></p>
+                      <h3>
+                        {{ $user.Name }}
+                        <div class="stars stars-{{ $feedback.Rating }}">
+                          <span class="star"></span>
+                          <span class="star"></span>
+                          <span class="star"></span>
+                          <span class="star"></span>
+                          <span class="star"></span>
+                        </div>
+                      </h3>
                       <p>{{ $feedback.Comment}}</p>
                     </div>
                   </div>
