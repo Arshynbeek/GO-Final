@@ -22,6 +22,7 @@ func Router() *gin.Engine {
 	router.GET("/signup/", SignUpPage)
 	router.GET("/product/:id", OptionalAuthMiddleware(), ProductPage)
 	router.GET("/profile/:id", AuthMiddleware(), ProfilePage)
+	router.GET("/edit-profile/:id", AuthMiddleware(), EditProfilePage)
 
 	router.Static("/static", "../../frontend/public")
 
@@ -150,6 +151,25 @@ func ProfilePage(c *gin.Context) {
 		"user":   user,
 		"orders": orders,
 		"foods":  foods,
+	})
+}
+
+func EditProfilePage(c *gin.Context) {
+	id := c.Param("id")
+	userID, exists := c.Get("userID")
+	if !exists || fmt.Sprintf("%d", userID) != id {
+		c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Unauthorized access to this profile"})
+		return
+	}
+
+	var user structs.User
+	if result := server.DB.First(&user, "id = ?", id); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.HTML(http.StatusOK, "edit-profile.html", gin.H{
+		"user": user,
 	})
 }
 

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .user.Name }}</title>
+
+    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/styles/pages/edit-profile.css" />
+  </head>
+
+  <body>
+    <div class="block">
+      <div class="form">
+        <h2>Edit Profile</h2>
+        <form id="edit-profile-Form" action="/api/v1/edit-profile" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="UserID" id="UserID" value="{{ .user.ID }}">
+          <input type="text" name="Name" id="Name" placeholder="New Name" value="{{ .user.Name }}" required />
+          <input type="text" name="Username" id="Username" placeholder="New Username" value="{{ .user.Username }}" required />
+          <input type="email" name="Email" id="Email" placeholder="New Email" value="{{ .user.Email }}" required />
+          <input type="password" name="OldPassword" id="OldPassword" placeholder="Old Password" required />
+          <input type="password" name="NewPassword" id="NewPassword" placeholder="New Password" required />
+
+          <label for="Picture">Profile Picture</label>
+          <input type="file" name="Picture" id="Picture" placeholder="Profile Picture" />
+      
+          <button type="submit">Submit Change</button>
+        </form>
+        <a href="/profile/{{ .user.ID }}" class="link">Prevent Changes</a>
+      </div>
+    </div>
+  </body>
+</html>

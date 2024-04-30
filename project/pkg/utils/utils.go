@@ -42,6 +42,7 @@ func Initialize(db *gorm.DB) {
 				Username: "admin",
 				Email:    "admin@admin.admin",
 				Password: hashPassword("admin_password"),
+				Picture:  "/static/images/icons/camera_off_icon.svg",
 				Admin:    true,
 			},
 			{
@@ -49,6 +50,7 @@ func Initialize(db *gorm.DB) {
 				Username: "user",
 				Email:    "user@gmail.com",
 				Password: hashPassword("user_password"),
+				Picture:  "/static/images/icons/camera_off_icon.svg",
 			},
 		}
 		if err := tx.Create(&users).Error; err != nil {

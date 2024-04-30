@@ -19,9 +19,10 @@ import (
 )
 
 func SetupAPIRoutes(router *gin.Engine) {
+	router.GET("/api/v1/signout/", SignOut)
 	router.POST("/api/v1/signin/", SignIn)
 	router.POST("/api/v1/signup/", SignUp)
-	router.GET("/api/v1/signout/", SignOut)
+	router.POST("/api/v1/edit-profile", EditProfile)
 
 	router.POST("/api/v1/buy/", BuyProdct)
 	router.POST("/api/v1/add/", AddProduct)
@@ -51,12 +52,12 @@ func SignUp(c *gin.Context) {
 
 	file, err := c.FormFile("Picture")
 	if err == nil {
-		fileExt := filepath.Ext(file.Filename)
-		newFileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), fileExt)
+		extension := filepath.Ext(file.Filename)
+		newFileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), extension)
 		path := filepath.Join("../../frontend/public/images/pfp/", newFileName)
 
 		if err := c.SaveUploadedFile(file, path); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save the file"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save the file" + err.Error()})
 			return
 		}
 
@@ -235,5 +236,87 @@ func Feedback(c *gin.Context) {
 	}
 
 	redirect := fmt.Sprintf("/product/%s", Values.FoodID)
+	c.Redirect(http.StatusFound, redirect)
+}
+
+func EditProfile(c *gin.Context) {
+	var Changes struct {
+		UserID      string `form:"UserID"`
+		Name        string `form:"Name"`
+		Username    string `form:"Username"`
+		Email       string `form:"Email"`
+		OldPassword string `form:"OldPassword"`
+		NewPassword string `form:"NewPassword"`
+	}
+
+	if err := c.Request.ParseMultipartForm(10 << 20); err != nil { // 10 MB limit
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to parse form: " + err.Error()})
+		return
+	}
+
+	if err := c.ShouldBind(&Changes); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to bind data: " + err.Error()})
+		return
+	}
+
+	if Changes.UserID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID cannot be empty"})
+		return
+	}
+
+	var data structs.User
+	if result := server.DB.Where("id = ?", Changes.UserID).First(&data); result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "User Not Found" + Changes.UserID})
+			return
+		}
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error() + Changes.UserID})
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(data.Password), []byte(Changes.OldPassword)); err != nil {
+		c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Invalid User Old Password"})
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(Changes.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
+		return
+	}
+
+	var user structs.User
+	if result := server.DB.Where("id = ?", Changes.UserID).First(&user); result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	user.Name = Changes.Name
+	user.Username = Changes.Username
+	user.Email = Changes.Email
+	user.Password = string(hashedPassword)
+
+	file, err := c.FormFile("Picture")
+	if err == nil {
+		extension := filepath.Ext(file.Filename)
+		newFileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), extension)
+		path := filepath.Join("../../frontend/public/images/pfp/", newFileName)
+
+		if err := c.SaveUploadedFile(file, path); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save file: " + err.Error()})
+			return
+		}
+
+		webPath := "/static/images/pfp/" + newFileName
+		webPath = strings.Replace(webPath, "\\", "/", -1)
+		user.Picture = webPath
+	}
+
+	if result := server.DB.Save(&user); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update user: " + result.Error.Error()})
+		return
+	}
+
+	redirect := fmt.Sprintf("/profile/%s", Changes.UserID)
 	c.Redirect(http.StatusFound, redirect)
 }

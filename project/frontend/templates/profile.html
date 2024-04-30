@@ -89,7 +89,11 @@
     <div class="container">
       <div class="info">
         <div class="user-pfp">
-          <img src="{{ .user.Picture }}" alt="User Picture">
+          {{ $picture := false }}
+          {{ if eq .user.Picture "/static/images/icons/camera_off_icon.svg" }}
+            {{ $picture = true }}
+          {{ end }}
+          <img src="{{ .user.Picture }}" alt="User Picture" class="{{ $picture}}">
         </div>
 
         <div class="user-info">
@@ -99,7 +103,7 @@
         </div>
 
         <div class="user-action">
-          <a href="">
+          <a href="/edit-profile/{{ $userID }}">
             <button class="button-neutral">
               <img src="/static/images/icons/edit_icon.svg" alt="">
               <!-- <img src="/static/images/icons/edit_write_pen_icon.svg" alt=""> -->
