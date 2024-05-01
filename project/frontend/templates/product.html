@@ -88,84 +88,145 @@
     </nav>
 
     <div class="container">
-      <div class="food-view">
-        {{ range $images := .food.Pictures }}
-          <div class="food-img">
-            <img src="{{ $images }}" alt="{{ $images }}">
-          </div>
-        {{ end }}
-      </div>
-
-      <div class="food-info">
-        <h2>{{ .food.Name }}</h2>
-        <p>{{ .food.Description }}</p>
-        <small>Quantity: <strong>{{ .food.Quantity }}</strong></small>
-
-        <div class="feedbacks">
-          <h2>
-            <img src="/static/images/icons/send_icon.svg" alt="">
-            Feedback
-          </h2>
-
-          <form action="/api/v1/feedback/" method="POST">
-            <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
-            <input type="hidden" name="FoodID" id="FoodID" value="{{ $foodID }}">
-            <span>
-              <h3>Rating: </h3>
-              <div class="rating">
-                <input type="radio" id="star5" name="Rating" value="5" required><label for="star5"></label>
-                <input type="radio" id="star4" name="Rating" value="4"><label for="star4"></label>
-                <input type="radio" id="star3" name="Rating" value="3"><label for="star3"></label>
-                <input type="radio" id="star2" name="Rating" value="2"><label for="star2"></label>
-                <input type="radio" id="star1" name="Rating" value="1"><label for="star1"></label>
-              </div>
-            </span>
-            <textarea name="Comment" id="Comment" rows="6" placeholder="Write Your Comment Here :)" required></textarea>
-            <button type="submit" class="button">Send Feedback</button>
-          </form>
-
-          <h2>Other Feedbacks</h2>
-
-          {{ $comment := false }}
-          {{ range $feedback := $.feedbacks }}
-            {{ range $user := $.users }}
-              {{ if eq $feedback.FoodID $foodID }}
-                {{ if eq $feedback.UserID $user.ID }}
-                  <div class="feedback">
-                    <div class="user-pfp">
-                      {{ if $user.Picture }}
-                        <img src="{{ $user.Picture }}" alt="User Picture">
-                      {{ else }}
-                        <img src="/static/images/icons/user_icon.svg" alt="User Picture">
-                      {{ end }}
+      <div class="food-details">
+        <div class="food-view">
+          {{ range $images := .food.Pictures }}
+            <div class="food-img">
+              <img src="{{ $images }}" alt="{{ $images }}">
+            </div>
+          {{ end }}
+        </div>
+  
+        <div class="food-info">
+          <h2>{{ .food.Name }}</h2>
+          <p>{{ .food.Description }}</p>
+          <small>Quantity: <strong>{{ .food.Quantity }}</strong></small>
+  
+          <div class="feedbacks">
+            <h2>
+              <img src="/static/images/icons/send_icon.svg" alt="">
+              Feedback
+            </h2>
+  
+            <form action="/api/v1/feedback/" method="POST">
+              <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
+              <input type="hidden" name="FoodID" id="FoodID" value="{{ $foodID }}">
+              <span>
+                <h3>Rating: </h3>
+                <div class="rating">
+                  <input type="radio" id="star5" name="Rating" value="5" required><label for="star5"></label>
+                  <input type="radio" id="star4" name="Rating" value="4"><label for="star4"></label>
+                  <input type="radio" id="star3" name="Rating" value="3"><label for="star3"></label>
+                  <input type="radio" id="star2" name="Rating" value="2"><label for="star2"></label>
+                  <input type="radio" id="star1" name="Rating" value="1"><label for="star1"></label>
+                </div>
+              </span>
+              <textarea name="Comment" id="Comment" rows="6" placeholder="Write Your Comment Here :)" required></textarea>
+              {{ if $userID }}
+                <button type="submit" class="button">Send Feedback</button>
+              {{ else }}
+                <button type="submit" class="button" disabled>Send Feedback</button>
+              {{ end }}
+            </form>
+  
+            <h2>Other Feedbacks</h2>
+  
+            {{ $comment := false }}
+            {{ range $feedback := $.feedbacks }}
+              {{ range $user := $.users }}
+                {{ if eq $feedback.FoodID $foodID }}
+                  {{ if eq $feedback.UserID $user.ID }}
+                    <div class="feedback">
+                      <div class="user-pfp">
+                        {{ $pfp := false }}
+                        {{ if eq $user.Picture "/static/images/icons/camera_off_icon.svg" }}
+                          {{ $pfp = true }}
+                        {{ end }}
+                        <img src="{{ $user.Picture }}" alt="User Picture" class="{{ $pfp }}">
+                      </div>
+  
+                      <div>
+                        <h3>
+                          {{ $user.Name }}
+                          <div class="stars stars-{{ $feedback.Rating }}">
+                            <span class="star"></span>
+                            <span class="star"></span>
+                            <span class="star"></span>
+                            <span class="star"></span>
+                            <span class="star"></span>
+                          </div>
+                        </h3>
+                        <p>{{ $feedback.Comment}}</p>
+                      </div>
                     </div>
-
-                    <div>
-                      <h3>
-                        {{ $user.Name }}
-                        <div class="stars stars-{{ $feedback.Rating }}">
-                          <span class="star"></span>
-                          <span class="star"></span>
-                          <span class="star"></span>
-                          <span class="star"></span>
-                          <span class="star"></span>
-                        </div>
-                      </h3>
-                      <p>{{ $feedback.Comment}}</p>
-                    </div>
-                  </div>
-
-                  {{ $comment = true }}
+  
+                    {{ $comment = true }}
+                  {{ end }}
                 {{ end }}
               {{ end }}
             {{ end }}
-          {{ end }}
-          {{ if not $comment }}
-            <p>At the moment, there are no feedbacks</p>
+            {{ if not $comment }}
+              <p>At the moment, there are no feedbacks</p>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+
+      <div class="other">
+        <h2>Other products in this category</h2>
+        <div class="products">
+          {{ range $product := .foods }}
+            {{ if eq $product.CategoryID $.food.CategoryID }}
+              <div class="card">
+                <div class="card-img">
+                  {{ range $picture := $product.Pictures }}
+                    <img src="{{ $picture }}" alt="Drink image">
+                    <span>
+                      <img src="/static/images/icons/tag_icon.svg" alt="">
+                      <strong>{{ $product.Price }}₸.</strong>
+                    </span>
+                  {{ end }}
+                </div>
+
+                <div class="card-info">
+                  <div>
+                    <h3>{{ $product.Name }}</h3>
+                    <p>{{ $product.Description }}</p>
+                  </div>
+                  
+                  <div>
+                    <small>Quantity: <strong>{{ $product.Quantity }}</strong></small>
+                    <span>
+                      {{ if $userID }}
+                        <form action="/api/v1/add/" method="POST">
+                          <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
+                          <input type="hidden" name="FoodID" id="FoodID" value="{{ $product.ID }}">
+                          <button class="button" type="submit">
+                            <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
+                            Add to cart
+                          </button>
+                        </form>
+                      {{ else }}
+                        <button class="button" disabled>
+                          <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
+                          Add to cart
+                        </button>
+                      {{ end }}
+
+                      <a href="/product/{{ $product.ID }}" class="link">
+                        more
+                        <img src="/static/images/icons/external_link_icon.svg" alt="">
+                        <!-- <img src="/static/images/icons/link_2_connection_icon.svg" alt=""> -->
+                        <!-- <img src="/static/images/icons/link_connection_icon.svg" alt=""> -->
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            {{ end }}
           {{ end }}
         </div>
       </div>
     </div>
-
   </body>
 </html>

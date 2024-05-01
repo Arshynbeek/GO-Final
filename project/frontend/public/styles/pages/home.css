@@ -88,3 +88,23 @@
   display: flex;
   gap: 20px;
 }
+
+.new-product {
+  width: 320px;
+  height: 360px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  background-color: var(--white);
+  box-shadow: 0px 0px 5px var(--black);
+
+  button {
+    width: 60px;
+    height: 60px;
+    border-radius: 100%;
+  }
+}

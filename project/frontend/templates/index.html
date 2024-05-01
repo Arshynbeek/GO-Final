@@ -18,23 +18,24 @@
         <li>
           <ul>
             <li>
-              <a href="">
-                <button>
-                  <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu">
-                </button>
-              </a>
+              <button class="menu">
+                <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu" class="menu-bar">
+                <img src="/static/images/icons/x_icon.svg" alt="close" class="menu-close">
+              </button>
+              <input class="menu-open" type="search" placeholder=">_ Search">
             </li>
 
             <li>
-              <a href="/">
+              <a href="/" class="link">
                 <button>
                   <img src="/static/images/icons/home_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Home</strong>
               </a>
             </li>
 
             <li>
-              <a href="/profile/{{ $userID }}">
+              <a href="/profile/{{ $userID }}" class="link">
                 <button>
                   {{ range $order := .orders }}
                     {{ if eq $order.UserID $userID}}
@@ -44,6 +45,7 @@
                   {{ end }}
                   <img src="/static/images/icons/bell_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Notifications</strong>
               </a>
             </li>
           </ul>
@@ -52,33 +54,37 @@
         <li>
           <ul>
             <li>
-              <a href="">
+              <a href="" class="link">
                 <button>
                   <img src="/static/images/icons/info_information_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Info</strong>
               </a>
             </li>
 
             <li>
-              <a href="">
+              <a href="" class="link">
                 <button>
                   <img src="/static/images/icons/settings_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Settings</strong>
               </a>
             </li>
 
             <li>
               {{ if $userID }}
-                <a href="/profile/{{ $userID }}">
+                <a href="/profile/{{ $userID }}" class="link">
                   <button>
                     <img src="/static/images/icons/user_icon.svg" alt="">
                   </button>
+                  <strong class="menu-open">Profile</strong>
                 </a>
               {{ else }}
-                <a href="/signin/">
+                <a href="/signin/" class="link">
                   <button>
                     <img src="/static/images/icons/log_in_icon.svg" alt="">
                   </button>
+                  <strong class="menu-open">Sign In</strong>
                 </a>
               {{ end }}
             </li>
@@ -138,6 +144,18 @@
         <div class="products-block">
           <h2>{{ $category.Name }}</h2>
           <div class="products">
+
+            {{ if $.user.Admin }}
+              <a href="/new-product/">
+                <div class="new-product">
+                  <button>
+                    <img src="/static/images/icons/plus_add_icon.svg" alt="plus">
+                  </button>
+                  <h3>New Product</h3>
+                </div>
+              </a>
+            {{ end }}
+            
             {{ range $food := $.foods }}
               {{ if eq $food.CategoryID $category.ID }}
                 <div class="card">
@@ -145,7 +163,7 @@
                     {{ range $picture := $food.Pictures }}
                       <img src="{{ $picture }}" alt="Drink image">
                       <span>
-                        <img src="/static/images/icons/tag_icon.svg" alt="">
+                        <img src="/static/images/icons/tag_icon.svg" alt="tag">
                         <strong>{{ $food.Price }}₸.</strong>
                       </span>
                     {{ end }}

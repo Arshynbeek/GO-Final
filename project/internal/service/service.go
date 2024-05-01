@@ -20,9 +20,10 @@ func Router() *gin.Engine {
 	router.GET("/", OptionalAuthMiddleware(), HomePage)
 	router.GET("/signin/", SignInPage)
 	router.GET("/signup/", SignUpPage)
-	router.GET("/product/:id", OptionalAuthMiddleware(), ProductPage)
 	router.GET("/profile/:id", AuthMiddleware(), ProfilePage)
 	router.GET("/edit-profile/:id", AuthMiddleware(), EditProfilePage)
+	router.GET("/product/:id", OptionalAuthMiddleware(), ProductPage)
+	router.GET("/new-product/", AuthMiddleware(), NewProductPage)
 
 	router.Static("/static", "../../frontend/public")
 
@@ -80,12 +81,6 @@ func ProductPage(c *gin.Context) {
 		return
 	}
 
-	var categories []structs.Category
-	if result := server.DB.Find(&categories); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
-		return
-	}
-
 	var orders []structs.Order
 	if result := server.DB.Find(&orders); result.Error != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
@@ -111,13 +106,12 @@ func ProductPage(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "product.html", gin.H{
-		"food":       food,
-		"foods":      foods,
-		"categories": categories,
-		"orders":     orders,
-		"feedbacks":  feedbacks,
-		"users":      users,
-		"user":       data,
+		"food":      food,
+		"foods":     foods,
+		"orders":    orders,
+		"feedbacks": feedbacks,
+		"users":     users,
+		"user":      data,
 	})
 }
 
@@ -173,6 +167,19 @@ func EditProfilePage(c *gin.Context) {
 	})
 }
 
+func NewProductPage(c *gin.Context) {
+	var categories []structs.Category
+	if result := server.DB.Find(&categories); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.HTML(http.StatusOK, "new-product.html", gin.H{
+		"title":      "New Product",
+		"categories": categories,
+	})
+}
+
 func SignUpPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "signup.html", gin.H{
 		"title": "Sign Up",
@@ -189,7 +196,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString, err := c.Cookie("jwt")
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "You need to be logged in to access this page"})
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "You need to be logged in to access this page"})
 			c.Abort()
 			return
 		}
@@ -205,7 +212,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			userID := uint(claims["user_id"].(float64))
 			c.Set("userID", userID)
 		} else {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
 		}

@@ -9,40 +9,62 @@ nav {
   background-color: var(--white);
   border: 1px solid black;
   border-radius: 10px;
+  transition: all 0.5s;
+  z-index: 10;
 
-  > ul {
+  ul {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: center;
+    align-items: start;
 
-    > li > ul {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
+    li {
+      width: 100%;
 
-      button {
-        position: relative;
-        padding: 10px;
+      ul {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
 
-        img {
-          width: 20px;
-          height: 20px;
+        li {
+          width: 100%;
+          display: flex;
+          gap: 10px;
+
+          a {
+            width: 100%;
+            border-radius: 10px;
+            display: flex;
+            align-items: end;
+            background-color: var(--grey);
+            gap: 10px;
+
+            strong {
+              padding: 6px 0;
+            }
+          }
         }
 
-        .mention {
-          position: absolute;
-          top: -6px;
-          right: -6px;
-          width: 12px;
-          height: 12px;
-          background-color: red;
-          border-radius: 100%;
+        button {
+          padding: 10px;
+
+          img {
+            width: 20px;
+            height: 20px;
+          }
         }
       }
     }
   }
+}
+
+.menu-open {
+  display: none;
+}
+
+.menu-close {
+  display: none;
 }

@@ -1,10 +1,16 @@
 .container {
   display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.food-details {
+  display: flex;
   gap: 40px;
 }
 
 .food-view {
-  max-width: 700px;
+  max-width: 50%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(5, 1fr);
@@ -12,7 +18,6 @@
 }
 
 .food-img {
-  max-height: 400px;
   width: 100%;
   height: 100%;
   border-radius: 10px;
@@ -21,6 +26,7 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  box-shadow: 0px 0px 5px var(--black);
 
   img {
     width: 100%;
@@ -31,26 +37,29 @@
   &:nth-child(1) {
     grid-column: 1/-1;
     grid-row: 1/4;
+    max-height: 500px;
   }
 
   &:nth-child(2) {
     grid-column: 1/2;
     grid-row: 4/6;
+    max-height: 300px;
   }
 
   &:nth-child(3) {
     grid-column: 2/3;
     grid-row: 4/6;
+    max-height: 300px;
   }
   
   &:nth-child(4) {
     grid-column: 3/4;
     grid-row: 4/6;
+    max-height: 300px;
   }
 }
 
 .food-info {
-
   .feedbacks {
     width: 100%;
     display: flex;
@@ -66,9 +75,10 @@
     }
 
     h3 {
+      width: 100%;
       display: flex;
-      gap: 10px;
       align-items: start;
+      gap: 10px;
     }
 
     .feedback {
@@ -79,13 +89,25 @@
       gap: 16px;
       
       .user-pfp {
-        height: 100%;
-        padding: 12px;
+        width: 50px;
+        height: 50px;
         display: flex;
         justify-content: center;
         align-items: center;
         border-radius: 100%;
         background-color: var(--white);
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .true {
+          width: 60%;
+          height: 60%;
+        }
       }
     }
   }
@@ -101,16 +123,6 @@ form {
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-
-  textarea {
-    resize: none;
-    width: 100%;
-    padding: 8px 12px;
-    margin-bottom: 10px;
-    border: 1px solid var(--black);
-    border-radius: 8px;
-    font-size: 16px;
   }
 }
 
@@ -177,4 +189,9 @@ form {
 .stars.stars-4 .star:nth-child(-n + 4):before,
 .stars.stars-5 .star:nth-child(-n + 5):before {
   content: '\2605';
+}
+
+.products {
+  display: flex;
+  gap: 20px;
 }

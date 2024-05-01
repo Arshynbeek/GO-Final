@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+
+    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/styles/pages/action.css" />
+  </head>
+
+  <body>
+    <div class="block">
+      <div class="form">
+        <h2>New Product</h2>
+        <form id="productForm" action="/api/v1/new/" method="POST" enctype="multipart/form-data">
+          <input type="text" name="Name" id="Name" placeholder="Product Name" required />
+          <textarea name="Description" id="Description" rows="4" placeholder="Product Description" required></textarea>
+
+          <label>Choose Category</label>
+          <ul>
+            {{ range $category := .categories }}
+              <li>
+                <label>
+                  <input type="radio" name="Category" id="Category{{ $category.ID }}" onchange="checkCategory()" value="{{ $category.ID }}" />
+                  {{ $category.Name }}
+                </label>
+              </li>
+            {{ end }}
+
+            <li>
+              <label>
+                <input type="radio" name="Category" id="Other" onchange="checkCategory()" value="0">
+                Other
+              </label>
+            </li>
+          </ul>
+
+          <div id="otherCategory">
+            <input type="text" name="NewCategory" id="NewCategory" placeholder="New Category" />
+          </div>
+
+          <input type="number" name="Quantity" id="Quantity" min="0" placeholder="Product Qquantity" required />
+          <input type="number" name="Price" id="Price" min="0" placeholder="Product Price" required />
+
+          <label for="Picture1">Product Picture</label>
+          <input type="file" name="Picture1" id="Picture1" placeholder="Product Picture 1" required />
+          <input type="file" name="Picture2" id="Picture2" placeholder="Product Picture 2" required />
+          <input type="file" name="Picture3" id="Picture3" placeholder="Product Picture 3" required />
+          <input type="file" name="Picture4" id="Picture4" placeholder="Product Picture 4" required />
+
+          <button type="submit">Add Product</button>
+        </form>
+        <a href="/" class="link">Cancel</a>
+      </div>
+    </div>
+
+    <script>
+      function checkCategory() {
+        var otherInput = document.getElementById("otherCategory");
+        if (document.getElementById("Other").checked) {
+          otherInput.style.display = "block";
+        } else {
+          otherInput.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>
