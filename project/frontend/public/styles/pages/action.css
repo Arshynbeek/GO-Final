@@ -12,6 +12,8 @@
 }
 
 .form {
+  max-width: 500px;
+  width: 100%;
   padding: 40px;
   border: 1px solid var(--black);
   border-radius: 10px;
@@ -39,6 +41,11 @@
         font-size: 16px;
       }
     }
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
   }
 
   p, a {

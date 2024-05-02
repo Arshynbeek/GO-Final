@@ -18,11 +18,15 @@ func Router() *gin.Engine {
 	router.LoadHTMLGlob("../../frontend/templates/*.html")
 
 	router.GET("/", OptionalAuthMiddleware(), HomePage)
+
 	router.GET("/signin/", SignInPage)
 	router.GET("/signup/", SignUpPage)
+
 	router.GET("/profile/:id", AuthMiddleware(), ProfilePage)
 	router.GET("/edit-profile/:id", AuthMiddleware(), EditProfilePage)
+
 	router.GET("/product/:id", OptionalAuthMiddleware(), ProductPage)
+	router.GET("/edit-product/:id", OptionalAuthMiddleware(), EditProductPage)
 	router.GET("/new-product/", AuthMiddleware(), NewProductPage)
 
 	router.Static("/static", "../../frontend/public")
@@ -64,54 +68,6 @@ func HomePage(c *gin.Context) {
 		"orders":     orders,
 		"categories": categories,
 		"user":       data,
-	})
-}
-
-func ProductPage(c *gin.Context) {
-	id := c.Param("id")
-	var food structs.Food
-	if result := server.DB.First(&food, "id = ?", id); result.Error != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
-		return
-	}
-
-	var foods []structs.Food
-	if result := server.DB.Find(&foods); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
-		return
-	}
-
-	var orders []structs.Order
-	if result := server.DB.Find(&orders); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
-		return
-	}
-
-	var feedbacks []structs.Feedback
-	if result := server.DB.Find(&feedbacks, "food_id = ?", id); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
-		return
-	}
-
-	var users []structs.User
-	if result := server.DB.Find(&users, "admin = ?", false); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
-		return
-	}
-
-	user, exists := c.Get("userID")
-	var data structs.User
-	if exists {
-		server.DB.First(&data, user)
-	}
-
-	c.HTML(http.StatusOK, "product.html", gin.H{
-		"food":      food,
-		"foods":     foods,
-		"orders":    orders,
-		"feedbacks": feedbacks,
-		"users":     users,
-		"user":      data,
 	})
 }
 
@@ -176,6 +132,74 @@ func NewProductPage(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "new-product.html", gin.H{
 		"title":      "New Product",
+		"categories": categories,
+	})
+}
+
+func ProductPage(c *gin.Context) {
+	id := c.Param("id")
+	var food structs.Food
+	if result := server.DB.First(&food, "id = ?", id); result.Error != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var foods []structs.Food
+	if result := server.DB.Find(&foods); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var orders []structs.Order
+	if result := server.DB.Find(&orders); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var feedbacks []structs.Feedback
+	if result := server.DB.Find(&feedbacks, "food_id = ?", id); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var users []structs.User
+	if result := server.DB.Find(&users, "admin = ?", false); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	user, exists := c.Get("userID")
+	var data structs.User
+	if exists {
+		server.DB.First(&data, user)
+	}
+
+	c.HTML(http.StatusOK, "product.html", gin.H{
+		"food":      food,
+		"foods":     foods,
+		"orders":    orders,
+		"feedbacks": feedbacks,
+		"users":     users,
+		"user":      data,
+	})
+}
+
+func EditProductPage(c *gin.Context) {
+	id := c.Param("id")
+	var food structs.Food
+	if result := server.DB.First(&food, "id = ?", id); result.Error != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	var categories []structs.Category
+	if result := server.DB.Find(&categories); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.HTML(http.StatusOK, "edit-product.html", gin.H{
+		"food":       food,
 		"categories": categories,
 	})
 }

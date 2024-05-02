@@ -28,6 +28,8 @@ func SetupAPIRoutes(router *gin.Engine) {
 	router.POST("/api/v1/buy/", BuyProduct)
 	router.POST("/api/v1/add/", AddProduct)
 	router.POST("/api/v1/remove/", RemoveProduct)
+	router.POST("/api/v1/delete/", DeleteProduct)
+	router.POST("/api/v1/edit-product/", EditProduct)
 
 	router.POST("/api/v1/feedback/", Feedback)
 }
@@ -278,6 +280,42 @@ func NewProduct(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
+func EditProduct(c *gin.Context) {
+	var Changes struct {
+		ID          uint   `form:"FoodID"`
+		Name        string `form:"Name"`
+		Description string `form:"Description"`
+		Quantity    uint   `form:"Quantity"`
+		Price       uint   `form:"Price"`
+		CategoryID  uint   `form:"Category"`
+	}
+
+	if err := c.ShouldBind(&Changes); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect form data: " + err.Error()})
+		return
+	}
+
+	var food structs.Food
+	if err := server.DB.First(&food, "id = ?", Changes.ID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Food item not found"})
+		return
+	}
+
+	food.Name = Changes.Name
+	food.Description = Changes.Description
+	food.Quantity = Changes.Quantity
+	food.Price = Changes.Price
+	food.CategoryID = Changes.CategoryID
+
+	if err := server.DB.Save(&food).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update food item: " + err.Error()})
+		return
+	}
+
+	redirect := fmt.Sprintf("/product/%d", Changes.ID)
+	c.Redirect(http.StatusFound, redirect)
+}
+
 func BuyProduct(c *gin.Context) {}
 
 func AddProduct(c *gin.Context) {
@@ -339,6 +377,21 @@ func RemoveProduct(c *gin.Context) {
 
 	redirect := fmt.Sprintf("/profile/%d", Values.UserID)
 	c.Redirect(http.StatusFound, redirect)
+}
+
+func DeleteProduct(c *gin.Context) {
+	var food structs.Food
+	if result := server.DB.First(&food, "id = ?", c.PostForm("ID")); result.Error != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	if result := server.DB.Delete(&food); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/")
 }
 
 func Feedback(c *gin.Context) {
