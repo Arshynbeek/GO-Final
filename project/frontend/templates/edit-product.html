@@ -13,7 +13,7 @@
     <div class="block">
       <div class="form">
         <h2>Edit {{ .food.Name }}</h2>
-        <form id="edit-product-Form" action="/api/v1/edit-product" method="POST" enctype="multipart/form-data">
+        <form id="edit-product-Form" action="/api/v1/edit-product/" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="FoodID" id="FoodID" value="{{ .food.ID }}" />
           <input type="text" name="Name" id="Name" placeholder="Product Name" value="{{ .food.Name }}" required />
           <textarea name="Description" id="Description" rows="4" placeholder="Product Description" required>{{ .food.Description }}</textarea>
@@ -35,7 +35,7 @@
           <button type="submit">Submit Change</button>
         </form>
         
-        <form action="/api/v1/delete" method="POST">
+        <form action="/api/v1/delete/" method="POST">
           <input type="hidden" name="ID" id="ID" value="{{ .food.ID }}">
           <button type="submit">Delete Product</button>
         </form>

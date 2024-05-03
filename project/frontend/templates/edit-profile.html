@@ -13,7 +13,7 @@
     <div class="block">
       <div class="form">
         <h2>Edit Profile</h2>
-        <form id="edit-profile-Form" action="/api/v1/edit-profile" method="POST" enctype="multipart/form-data">
+        <form id="edit-profile-Form" action="/api/v1/edit-profile/" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="UserID" id="UserID" value="{{ .user.ID }}">
           <input type="text" name="Name" id="Name" placeholder="New Name" value="{{ .user.Name }}" required />
           <input type="text" name="Username" id="Username" placeholder="New Username" value="{{ .user.Username }}" required />

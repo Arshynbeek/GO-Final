@@ -91,8 +91,8 @@ func Initialize(db *gorm.DB) {
 	tx.Model(&structs.Order{}).Count(&orderCount)
 	if orderCount == 0 {
 		orders := []structs.Order{
-			{FoodID: 1, UserID: 2},
-			{FoodID: 4, UserID: 2},
+			{FoodID: 1, Quantity: 1, UserID: 2},
+			{FoodID: 4, Quantity: 1, UserID: 2},
 		}
 		if err := tx.Create(&orders).Error; err != nil {
 			tx.Rollback()

@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -42,6 +41,11 @@ func SignUp(c *gin.Context) {
 		Password string `form:"Password"`
 	}
 
+	if err := c.ShouldBind(&Credentials); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid form data"})
+		return
+	}
+
 	if err := c.Request.ParseMultipartForm(10 << 20); err != nil { // 10 MB limit
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Error parsing form"})
 		return
@@ -67,7 +71,7 @@ func SignUp(c *gin.Context) {
 		path := filepath.Join("../../frontend/public/images/pfp/", newFileName)
 
 		if err := c.SaveUploadedFile(file, path); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save the file" + err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save the file: " + err.Error()})
 			return
 		}
 
@@ -320,8 +324,9 @@ func BuyProduct(c *gin.Context) {}
 
 func AddProduct(c *gin.Context) {
 	var Values struct {
-		UserID string `form:"UserID"`
-		FoodID string `form:"FoodID"`
+		UserID   uint `form:"UserID"`
+		FoodID   uint `form:"FoodID"`
+		Quantity uint `form:"Quantity"`
 	}
 
 	if err := c.ShouldBind(&Values); err != nil {
@@ -329,21 +334,10 @@ func AddProduct(c *gin.Context) {
 		return
 	}
 
-	userID, err := strconv.Atoi(Values.UserID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error in user id": userID})
-		return
-	}
-
-	foodID, err := strconv.Atoi(Values.FoodID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error in food id": foodID})
-		return
-	}
-
 	order := structs.Order{
-		UserID: uint(userID),
-		FoodID: uint(foodID),
+		UserID:   Values.UserID,
+		FoodID:   Values.FoodID,
+		Quantity: Values.Quantity,
 	}
 
 	if err := server.DB.Create(&order).Error; err != nil {
