@@ -4,9 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error</title>
+
+    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/styles/pages/error.css" />
   </head>
 
   <body>
-    <h1>Arch: {{ . }}</h1>
+    <div class="block">
+      <div class="title">
+        <h2>{{ .status }} Error</h2>
+        <div class="img">
+          <img src="/static/images/error.png" alt="Eror">
+        </div>
+      </div>
+      
+      <div class="content">
+        <h1>I have bad news<br>for you</h1>
+        <p>Arch: {{ .error }}</p>
+        <a href="/">
+          <button>Back To Home</button>
+        </a>
+      </div>
+    </div>
   </body>
 </html>

@@ -40,19 +40,28 @@ func Router() *gin.Engine {
 func HomePage(c *gin.Context) {
 	var foods []structs.Food
 	if result := server.DB.Find(&foods); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var categories []structs.Category
 	if result := server.DB.Find(&categories); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var orders []structs.Order
 	if result := server.DB.Find(&orders); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
@@ -75,38 +84,56 @@ func ProfilePage(c *gin.Context) {
 	id := c.Param("id")
 	userID, exists := c.Get("userID")
 	if !exists || fmt.Sprintf("%d", userID) != id {
-		c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Unauthorized access to this profile"})
+		c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  "Unauthorized access to this profile",
+		})
 		return
 	}
 
 	var user structs.User
 	if result := server.DB.First(&user, "id = ?", id); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var orders []structs.Order
 	if result := server.DB.Where("user_id = ?", id).Find(&orders); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var foods []structs.Food
 	if result := server.DB.Find(&foods); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	if user.Admin {
 		var users []structs.User
 		if result := server.DB.Find(&users); result.Error != nil {
-			c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"status": http.StatusInternalServerError,
+				"error":  result.Error.Error(),
+			})
 			return
 		}
 
 		var orders []structs.Order
 		if result := server.DB.Find(&orders); result.Error != nil {
-			c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"status": http.StatusInternalServerError,
+				"error":  result.Error.Error(),
+			})
 			return
 		}
 
@@ -129,13 +156,19 @@ func EditProfilePage(c *gin.Context) {
 	id := c.Param("id")
 	userID, exists := c.Get("userID")
 	if !exists || fmt.Sprintf("%d", userID) != id {
-		c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Unauthorized access to this profile"})
+		c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  "Unauthorized access to this profile",
+		})
 		return
 	}
 
 	var user structs.User
 	if result := server.DB.First(&user, "id = ?", id); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
@@ -147,7 +180,10 @@ func EditProfilePage(c *gin.Context) {
 func NewProductPage(c *gin.Context) {
 	var categories []structs.Category
 	if result := server.DB.Find(&categories); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
@@ -161,31 +197,46 @@ func ProductPage(c *gin.Context) {
 	id := c.Param("id")
 	var food structs.Food
 	if result := server.DB.First(&food, "id = ?", id); result.Error != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"status": http.StatusNotFound,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var foods []structs.Food
 	if result := server.DB.Find(&foods); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var orders []structs.Order
 	if result := server.DB.Find(&orders); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var feedbacks []structs.Feedback
 	if result := server.DB.Find(&feedbacks, "food_id = ?", id); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var users []structs.User
 	if result := server.DB.Find(&users, "admin = ?", false); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
@@ -209,13 +260,19 @@ func EditProductPage(c *gin.Context) {
 	id := c.Param("id")
 	var food structs.Food
 	if result := server.DB.First(&food, "id = ?", id); result.Error != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"status": http.StatusNotFound,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	var categories []structs.Category
 	if result := server.DB.Find(&categories); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
@@ -241,7 +298,10 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString, err := c.Cookie("jwt")
 		if err != nil {
-			c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "You need to be logged in to access this page"})
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+				"status": http.StatusUnauthorized,
+				"error":  "You need to be signed in to access this page",
+			})
 			c.Abort()
 			return
 		}
@@ -257,7 +317,10 @@ func AuthMiddleware() gin.HandlerFunc {
 			userID := uint(claims["user_id"].(float64))
 			c.Set("userID", userID)
 		} else {
-			c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Invalid token"})
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+				"status": http.StatusUnauthorized,
+				"error":  "Invalid token",
+			})
 			c.Abort()
 			return
 		}

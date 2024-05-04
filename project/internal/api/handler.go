@@ -42,12 +42,18 @@ func SignUp(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&Credentials); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid form data"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Invalid form data: " + err.Error(),
+		})
 		return
 	}
 
 	if err := c.Request.ParseMultipartForm(10 << 20); err != nil { // 10 MB limit
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Error parsing form"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to parse form: " + err.Error(),
+		})
 		return
 	}
 
@@ -59,7 +65,10 @@ func SignUp(c *gin.Context) {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to hash password: " + err.Error(),
+		})
 		return
 	}
 	newUser.Password = string(hashedPassword)
@@ -71,7 +80,10 @@ func SignUp(c *gin.Context) {
 		path := filepath.Join("../../frontend/public/images/pfp/", newFileName)
 
 		if err := c.SaveUploadedFile(file, path); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save the file: " + err.Error()})
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"status": http.StatusInternalServerError,
+				"error":  "Failed to save the file: " + err.Error(),
+			})
 			return
 		}
 
@@ -83,7 +95,10 @@ func SignUp(c *gin.Context) {
 	}
 
 	if result := server.DB.Create(&newUser); result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
@@ -97,28 +112,43 @@ func SignIn(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&Credentials); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to bind data: " + err.Error(),
+		})
 		return
 	}
 
 	var user structs.User
 	if result := server.DB.Where("Username = ?", Credentials.Username).First(&user); result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "User Not Found"})
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+				"status": http.StatusUnauthorized,
+				"error":  "User Not Found",
+			})
 			return
 		}
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Credentials.Password)); err != nil {
-		c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Invalid credentials"})
+		c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  "Invalid credentials",
+		})
 		return
 	}
 
 	token, err := utils.GenerateJWT(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to generate token: " + err.Error(),
+		})
 		return
 	}
 
@@ -142,39 +172,60 @@ func EditProfile(c *gin.Context) {
 	}
 
 	if err := c.Request.ParseMultipartForm(10 << 20); err != nil { // 10 MB limit
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to parse form: " + err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to parse form: " + err.Error(),
+		})
 		return
 	}
 
 	if err := c.ShouldBind(&Changes); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to bind data: " + err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to bind data: " + err.Error(),
+		})
 		return
 	}
 
 	var data structs.User
 	if result := server.DB.Where("id = ?", Changes.UserID).First(&data); result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "User Not Found"})
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+				"status": http.StatusUnauthorized,
+				"error":  "User Not Found",
+			})
 			return
 		}
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  result.Error.Error(),
+		})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(data.Password), []byte(Changes.OldPassword)); err != nil {
-		c.HTML(http.StatusUnauthorized, "error.html", gin.H{"error": "Invalid User Old Password"})
+		c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  "Invalid User Old Password",
+		})
 		return
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(Changes.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to hash password",
+		})
 		return
 	}
 
 	var user structs.User
 	if result := server.DB.Where("id = ?", Changes.UserID).First(&user); result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"status": http.StatusNotFound,
+			"error":  "User not found",
+		})
 		return
 	}
 
@@ -190,7 +241,10 @@ func EditProfile(c *gin.Context) {
 		path := filepath.Join("../../frontend/public/images/pfp/", newFileName)
 
 		if err := c.SaveUploadedFile(file, path); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save file: " + err.Error()})
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"status": http.StatusInternalServerError,
+				"error":  "Failed to save file: " + err.Error(),
+			})
 			return
 		}
 
@@ -200,7 +254,10 @@ func EditProfile(c *gin.Context) {
 	}
 
 	if result := server.DB.Save(&user); result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update user: " + result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to update user: " + result.Error.Error(),
+		})
 		return
 	}
 
@@ -219,11 +276,18 @@ func NewProduct(c *gin.Context) {
 	}
 
 	if err := c.Request.ParseMultipartForm(10 << 20); err != nil { // 10 MB limit
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to parse form: " + err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to parse form: " + err.Error(),
+		})
 		return
 	}
 
 	if err := c.ShouldBind(&Product); err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to bind data: " + err.Error(),
+		})
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect form data: " + err.Error()})
 		return
 	}
@@ -233,16 +297,25 @@ func NewProduct(c *gin.Context) {
 		if Product.NewCategory != "" {
 			category.Name = Product.NewCategory
 			if err := server.DB.Create(&category).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create new Category: " + err.Error()})
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+					"status": http.StatusInternalServerError,
+					"error":  "Failed to create new Category: " + err.Error(),
+				})
 				return
 			}
 		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "New category name required"})
+			c.HTML(http.StatusBadRequest, "error.html", gin.H{
+				"status": http.StatusBadRequest,
+				"error":  "New category name required",
+			})
 			return
 		}
 	} else {
 		if err := server.DB.First(&category, "id = ?", Product.CategoryID).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Category not found"})
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"status": http.StatusInternalServerError,
+				"error":  "Category not found: " + err.Error(),
+			})
 			return
 		}
 	}
@@ -264,7 +337,10 @@ func NewProduct(c *gin.Context) {
 			path := filepath.Join("../../frontend/public/images/products/", newFileName)
 
 			if err := c.SaveUploadedFile(file, path); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file: " + err.Error()})
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+					"status": http.StatusInternalServerError,
+					"error":  "Failed to save file: " + err.Error(),
+				})
 				return
 			}
 
@@ -277,7 +353,10 @@ func NewProduct(c *gin.Context) {
 	}
 
 	if err := server.DB.Create(&newProduct).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create new product: " + err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to create new Product: " + err.Error(),
+		})
 		return
 	}
 
@@ -295,13 +374,19 @@ func EditProduct(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&Changes); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect form data: " + err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to bind data: " + err.Error(),
+		})
 		return
 	}
 
 	var food structs.Food
 	if err := server.DB.First(&food, "id = ?", Changes.ID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Food item not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"status": http.StatusNotFound,
+			"error":  "Food not found: " + err.Error(),
+		})
 		return
 	}
 
@@ -312,7 +397,10 @@ func EditProduct(c *gin.Context) {
 	food.CategoryID = Changes.CategoryID
 
 	if err := server.DB.Save(&food).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update food item: " + err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to update food: " + err.Error(),
+		})
 		return
 	}
 
@@ -325,14 +413,20 @@ func BuyProduct(c *gin.Context) {
 
 	tx := server.DB.Begin()
 	if err := tx.Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction start failed"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Transaction start failed: " + err.Error(),
+		})
 		return
 	}
 
 	var orders []structs.Order
 	if err := tx.Where("user_id = ? AND status = false", userID).Find(&orders).Error; err != nil {
 		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch orders"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to fetch orders: " + err.Error(),
+		})
 		return
 	}
 
@@ -340,32 +434,47 @@ func BuyProduct(c *gin.Context) {
 		var food structs.Food
 		if err := tx.First(&food, order.FoodID).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch food item"})
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"status": http.StatusInternalServerError,
+				"error":  "Failed to fetch food: " + err.Error(),
+			})
 			return
 		}
 
 		if food.Quantity < order.Quantity {
 			tx.Rollback()
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Not enough stock for food item"})
+			c.HTML(http.StatusBadRequest, "error.html", gin.H{
+				"status": http.StatusBadRequest,
+				"error":  "Not enough stock for food item",
+			})
 			return
 		}
 
 		newQuantity := food.Quantity - order.Quantity
 		if err := tx.Model(&food).Update("quantity", newQuantity).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update food quantity"})
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"status": http.StatusInternalServerError,
+				"error":  "Failed to update food quantity: " + err.Error(),
+			})
 			return
 		}
 
 		if err := tx.Model(&order).Update("status", true).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update order status"})
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"status": http.StatusInternalServerError,
+				"error":  "Failed to update order status",
+			})
 			return
 		}
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction commit failed"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Transaction commit failed",
+		})
 		return
 	}
 
@@ -381,7 +490,10 @@ func AddProduct(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&Values); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to bind data: " + err.Error(),
+		})
 		return
 	}
 
@@ -392,7 +504,10 @@ func AddProduct(c *gin.Context) {
 	}
 
 	if err := server.DB.Create(&order).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add product to cart"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to add product to cart",
+		})
 		return
 	}
 
@@ -406,7 +521,10 @@ func RemoveProduct(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&Values); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to bind data: " + err.Error(),
+		})
 		return
 	}
 
@@ -416,7 +534,10 @@ func RemoveProduct(c *gin.Context) {
 	}
 
 	if err := server.DB.Where("user_id = ? AND food_id = ?", Values.UserID, Values.FoodID).Delete(&order).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove product from cart"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to remove product from cart",
+		})
 		return
 	}
 
@@ -427,12 +548,18 @@ func RemoveProduct(c *gin.Context) {
 func DeleteProduct(c *gin.Context) {
 	var food structs.Food
 	if result := server.DB.First(&food, "id = ?", c.PostForm("ID")); result.Error != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"status": http.StatusNotFound,
+			"error":  "Food not found: " + result.Error.Error(),
+		})
 		return
 	}
 
 	if result := server.DB.Delete(&food); result.Error != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to delete product: " + result.Error.Error(),
+		})
 		return
 	}
 
@@ -448,7 +575,10 @@ func Feedback(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&Values); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Failed to bind data: " + err.Error(),
+		})
 		return
 	}
 
@@ -460,7 +590,10 @@ func Feedback(c *gin.Context) {
 	}
 
 	if err := server.DB.Create(&feedback).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record feedback to product"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to record feedback to product",
+		})
 		return
 	}
 
