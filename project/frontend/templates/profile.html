@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .user.Name }}</title>
-    
+
     <link rel="stylesheet" href="/static/main.css">
     <link rel="stylesheet" href="/static/styles/pages/profile.css">
   </head>
@@ -36,7 +37,7 @@
               <a href="/profile/{{ $userID }}">
                 <button>
                   {{ range $order := .orders }}
-                    {{ if eq $order.UserID $userID}}
+                    {{ if eq $order.UserID $userID }}
                       <span class="mention"></span>
                       {{ break }}
                     {{ end }}
@@ -124,7 +125,7 @@
             <img src="/static/images/icons/bell_icon.svg" alt="">
             Notifications
           </h2>
-          
+
           {{ $notice := false }}
           {{ range $order := $.orders }}
             {{ range $food := $.foods }}
@@ -134,7 +135,7 @@
                     <div class="notify-icon">
                       <img src="/static/images/icons/message_square_icon.svg" alt="">
                     </div>
-                    
+
                     <div>
                       <h3>Action successful</h3>
                       <p>{{ $food.Name }} added to cart.</p>
@@ -153,73 +154,160 @@
         </div>
       </div>
 
-      <div class="cart-block">
-        <h2>Cart</h2>
-        <div class="cart">
+      <div class="user-details">
+        <div class="cart-block">
           {{ $item := false }}
-          {{ range $order := $.orders }}
-            {{ if eq $order.UserID $userID}}
-              {{ range $food := $.foods }}
-                {{ if eq $food.ID $order.FoodID }}
-                  <div class="card">
-                    <div class="card-img">
-                      {{ range $picture := $food.Pictures }}
-                        <img src="{{ $picture }}" alt="Drink image">
-                        <span>
-                          <img src="/static/images/icons/tag_icon.svg" alt="">
-                          <strong>{{ $food.Price }}₸.</strong>
-                        </span>
-                      {{ end }}
-                    </div>
-      
-                    <div class="card-info">
-                      <div>
-                        <h3>{{ $food.Name }}</h3>
-                        <p>{{ $food.Description }}</p>
-                      </div>
-                      
-                      <div>
-                        <small>Quantity: <strong>{{ $order.Quantity }}</strong></small>
-                        <span>
+          <h2>Cart</h2>
+          <div class="cart">
+            {{ range $order := $.orders }}
+              {{ if and (eq $order.UserID $userID) (not $order.Status) }}
+                {{ range $food := $.foods }}
+                  {{ if eq $food.ID $order.FoodID }}
+                    <div class="card">
+                      <div class="card-img">
+                        {{ range $picture := $food.Pictures }}
+                          <img src="{{ $picture }}" alt="Drink image">
                           <span>
-                            <form action="/api/v1/buy/" method="POST">
-                              <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
-                              <input type="hidden" name="FoodID" id="FoodID" value="{{ $food.ID }}">
-                              <button class="button" type="submit">
-                                <img src="/static/images/icons/box_package_delivery_icon.svg" alt="">
-                                Buy
-                              </button>
-                            </form>
-
+                            <img src="/static/images/icons/tag_icon.svg" alt="">
+                            <strong>{{ $food.Price }}₸.</strong>
+                          </span>
+                        {{ end }}
+                      </div>
+  
+                      <div class="card-info">
+                        <div>
+                          <h3>{{ $food.Name }}</h3>
+                          <p>{{ $food.Description }}</p>
+                        </div>
+  
+                        <div>
+                          <small>Quantity: <strong>{{ $order.Quantity }}</strong></small>
+                          <span>
                             <form action="/api/v1/remove/" method="POST">
-                              <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
-                              <input type="hidden" name="FoodID" id="FoodID" value="{{ $food.ID }}">
+                              <input type="hidden" name="UserID" value="{{ $userID }}">
+                              <input type="hidden" name="FoodID" value="{{ $food.ID }}">
                               <button class="button button-neutral" type="submit">
                                 <img src="/static/images/icons/trash_icon.svg" alt="">
                                 Remove
                               </button>
                             </form>
+  
+                            <a href="/product/{{ $food.ID }}" class="link">
+                              more
+                              <img src="/static/images/icons/external_link_icon.svg" alt="">
+                            </a>
                           </span>
-      
+                        </div>
+                      </div>
+                    </div>
+                    {{ $item = true }}
+                  {{ end }}
+                {{ end }}
+              {{ end }}
+            {{ end }}
+            {{ if not $item }}
+              <h3>Your cart is empty</h3>
+            {{ end }}
+          </div>
+  
+          {{ if $item }}
+            <span>
+              <h3 id="price">Total Price: 0₸.</h3>
+              <form action="/api/v1/buy/" method="POST">
+                <input type="hidden" name="UserID" value="{{ $userID }}" />
+                <button class="button">
+                  <img src="/static/images/icons/box_package_delivery_icon.svg" alt="">
+                  Buy
+                </button>
+              </form>
+            </span>
+          {{ end }}
+        </div>
+
+        <div class="order-block">
+          {{ $item := false }}
+          <h2>Your Order</h2>
+          <div class="order">
+            {{ range $order := $.orders }}
+              {{ if and (eq $order.UserID $userID) $order.Status }}
+                {{ range $food := $.foods }}
+                  {{ if eq $food.ID $order.FoodID }}
+                    <div class="card">
+                      <div class="card-img">
+                        {{ range $picture := $food.Pictures }}
+                          <img src="{{ $picture }}" alt="Drink image">
+                          <span>
+                            <img src="/static/images/icons/tag_icon.svg" alt="">
+                            <strong>{{ $food.Price }}₸.</strong>
+                          </span>
+                        {{ end }}
+                      </div>
+  
+                      <div class="card-info">
+                        <div>
+                          <h3>{{ $food.Name }}</h3>
+                          <p>{{ $food.Description }}</p>
+                        </div>
+  
+                        <div>
+                          <small>Quantity: <strong>{{ $order.Quantity }}</strong></small>
                           <a href="/product/{{ $food.ID }}" class="link">
                             more
                             <img src="/static/images/icons/external_link_icon.svg" alt="">
                           </a>
-                        </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  {{ $item = true }}
+                    {{ $item = true }}
+                  {{ end }}
                 {{ end }}
               {{ end }}
             {{ end }}
-          {{ end }}
-          {{ if not $item }}
-            <h3>Your cart is empty</h3>
+            {{ if not $item }}
+              <h3>You haven't ordered anything yet.</h3>
+            {{ end }}
+          </div>
+  
+          {{ if $item }}
+            <span>
+              <h3 id="total">Total Price: 0₸.</h3>
+            </span>
           {{ end }}
         </div>
       </div>
     </div>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        function calculateTotalPrice(containerSelector, totalElementId) {
+          const container = document.querySelectorAll(containerSelector + ' .card');
+          let total = 0;
+
+          container.forEach(function (card) {
+            const priceElement = card.querySelector(".card-img strong");
+            const quantityElement = card.querySelector(".card-info small strong");
+
+            const price = parseFloat(priceElement.textContent);
+            const quantity = parseInt(quantityElement.textContent);
+
+            total += price * quantity;
+          });
+
+          const totalDisplayElement = document.getElementById(totalElementId);
+          if (totalDisplayElement) {
+            totalDisplayElement.textContent = `Total Price: ${total.toFixed(2)}₸.`;
+          }
+        }
+
+        function updateTotalPrices() {
+          calculateTotalPrice('.cart', 'price');
+          calculateTotalPrice('.order', 'total');
+        }
+
+        updateTotalPrices();
+      });
+    </script>
+
   </body>
+
 </html>

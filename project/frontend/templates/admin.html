@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+
+    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/styles/pages/admin.css" />
+  </head>
+
+  <body>
+    {{ $userID := .admin.ID }}
+    <nav>
+      <ul>
+        <li>
+          <ul>
+            <li>
+              <button class="menu">
+                <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu" class="menu-bar">
+                <img src="/static/images/icons/x_icon.svg" alt="close" class="menu-close">
+              </button>
+              <input class="menu-open" type="search" placeholder=">_ Search">
+            </li>
+
+            <li>
+              <a href="/" class="link">
+                <button>
+                  <img src="/static/images/icons/home_icon.svg" alt="">
+                </button>
+                <strong class="menu-open">Home</strong>
+              </a>
+            </li>
+
+            <li>
+              <a href="/profile/{{ $userID }}" class="link">
+                <button>
+                  {{ range $order := .orders }}
+                    {{ if eq $order.UserID $userID }}
+                      <span class="mention"></span>
+                      {{ break }}
+                    {{ end }}
+                  {{ end }}
+                  <img src="/static/images/icons/bell_icon.svg" alt="">
+                </button>
+                <strong class="menu-open">Notifications</strong>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <ul>
+            <li>
+              <a href="" class="link">
+                <button>
+                  <img src="/static/images/icons/info_information_icon.svg" alt="">
+                </button>
+                <strong class="menu-open">Info</strong>
+              </a>
+            </li>
+
+            <li>
+              <a href="" class="link">
+                <button>
+                  <img src="/static/images/icons/settings_icon.svg" alt="">
+                </button>
+                <strong class="menu-open">Settings</strong>
+              </a>
+            </li>
+
+            <li>
+              {{ if $userID }}
+                <a href="/profile/{{ $userID }}" class="link">
+                  <button>
+                    <img src="/static/images/icons/user_icon.svg" alt="">
+                  </button>
+                  <strong class="menu-open">Profile</strong>
+                </a>
+              {{ else }}
+                <a href="/signin/" class="link">
+                  <button>
+                    <img src="/static/images/icons/log_in_icon.svg" alt="">
+                  </button>
+                  <strong class="menu-open">Sign In</strong>
+                </a>
+              {{ end }}
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <div class="admin">
+        <h2>Admin</h2>
+        <p>Status: <strong>{{ .admin.Name }}</strong></p>
+        <p>Email: <strong>{{ .admin.Email }}</strong></p>
+        
+        <div class="admin-action">
+          <div class="user-action">
+            <a href="/edit-profile/{{ $userID }}">
+              <button class="button button-neutral">
+                <img src="/static/images/icons/edit_icon.svg" alt="">
+                <!-- <img src="/static/images/icons/edit_write_pen_icon.svg" alt=""> -->
+                Edit Profile
+              </button>
+            </a>
+  
+            <a href="/api/v1/signout/">
+              <button class="button button-negative">
+                <img src="/static/images/icons/log_out_icon.svg" alt="">
+                Sign Out
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <h2>Orders</h2>
+      <div class="content">
+        {{ range $user := $.users }}
+          {{ $hasOrders := false }}
+          {{ range $order := $.orders }}
+            {{ if and (eq $order.UserID $user.ID) (eq $order.Status true) }}
+              {{ $hasOrders = true }}
+            {{ end }}
+          {{ end }}
+
+          {{ if $hasOrders }}
+            <div class="orders">
+              <div class="user-info">
+                <div class="user-pfp">
+                  <img src="{{ $user.Picture }}" alt="User Picture">
+                </div>
+                <div>
+                  <h3>{{ $user.Name }}</h3>
+                  <p>{{ $user.Email }}</p>
+                </div>
+              </div>
+
+              <div class="products">
+                {{ range $order := $.orders }}
+                  {{ if and (eq $order.UserID $user.ID) (eq $order.Status true) }}
+                    {{ range $food := $.foods }}
+                      {{ if eq $food.ID $order.FoodID }}
+                        <div class="card">
+                          <div class="card-img">
+                            {{ range $picture := $food.Pictures }}
+                              <img src="{{ $picture }}" alt="Food image">
+                              <span>
+                                <img src="/static/images/icons/tag_icon.svg" alt="">
+                                <strong>{{ $food.Price }}₸.</strong>
+                              </span>
+                            {{ end }}
+                          </div>
+
+                          <div class="card-info">
+                            <div>
+                              <h3>{{ $food.Name }}</h3>
+                              <p>{{ $food.Description }}</p>
+                            </div>
+
+                            <div>
+                              <small>Quantity: <strong>{{ $order.Quantity }}</strong></small>
+                              <span>
+                                <form action="/api/v1/remove/" method="POST">
+                                  <input type="hidden" name="UserID" value="{{ $user.ID }}">
+                                  <input type="hidden" name="FoodID" value="{{ $food.ID }}">
+                                  <button class="button button-neutral" type="submit">
+                                    <img src="/static/images/icons/trash_icon.svg" alt="">
+                                    Remove
+                                  </button>
+                                </form>
+
+                                <a href="/product/{{ $food.ID }}" class="link">
+                                  more
+                                  <img src="/static/images/icons/external_link_icon.svg" alt="">
+                                </a>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      {{ end }}
+                    {{ end }}
+                  {{ end }}
+                {{ end }}
+              </div>
+            </div>
+          {{ end }}
+        {{ end }}
+      </div>
+    </div>        
+
+    <script src="/static/script.js"></script>
+  </body>
+
+</html>

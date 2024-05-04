@@ -80,7 +80,13 @@
   }
 }
 
-.cart-block {
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.cart-block, .order-block {
   display: flex;
   flex-direction: column;
   background-color: var(--grey);
@@ -88,9 +94,21 @@
   padding: 10px;
   width: 100%;
   height: 100%;
+  
+  > span {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: var(--white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
-.cart {
+.cart, .order {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 }

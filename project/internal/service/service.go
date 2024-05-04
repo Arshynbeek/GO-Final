@@ -86,7 +86,7 @@ func ProfilePage(c *gin.Context) {
 	}
 
 	var orders []structs.Order
-	if result := server.DB.Find(&orders); result.Error != nil {
+	if result := server.DB.Where("user_id = ?", id).Find(&orders); result.Error != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
 		return
 	}
@@ -97,11 +97,32 @@ func ProfilePage(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "profile.html", gin.H{
-		"user":   user,
-		"orders": orders,
-		"foods":  foods,
-	})
+	if user.Admin {
+		var users []structs.User
+		if result := server.DB.Find(&users); result.Error != nil {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+			return
+		}
+
+		var orders []structs.Order
+		if result := server.DB.Find(&orders); result.Error != nil {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": result.Error.Error()})
+			return
+		}
+
+		c.HTML(http.StatusOK, "admin.html", gin.H{
+			"admin":  user,
+			"users":  users,
+			"orders": orders,
+			"foods":  foods,
+		})
+	} else {
+		c.HTML(http.StatusOK, "profile.html", gin.H{
+			"user":   user,
+			"orders": orders,
+			"foods":  foods,
+		})
+	}
 }
 
 func EditProfilePage(c *gin.Context) {

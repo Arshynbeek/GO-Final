@@ -32,21 +32,17 @@
       display: flex;
       justify-content: space-between;
       align-items: end;
+    }
 
-      a {
-        display: flex;
-        align-items: center;
-        gap: 6px;
+    a {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
 
-        img {
-          width: 16px;
-          height: 16px;
-        }
-      }
-
-      span {
-        display: flex;
-        gap: 10px;
+      img {
+        width: 16px;
+        height: 16px;
       }
     }
   }

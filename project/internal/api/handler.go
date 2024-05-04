@@ -320,7 +320,58 @@ func EditProduct(c *gin.Context) {
 	c.Redirect(http.StatusFound, redirect)
 }
 
-func BuyProduct(c *gin.Context) {}
+func BuyProduct(c *gin.Context) {
+	userID := c.PostForm("UserID")
+
+	tx := server.DB.Begin()
+	if err := tx.Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction start failed"})
+		return
+	}
+
+	var orders []structs.Order
+	if err := tx.Where("user_id = ? AND status = false", userID).Find(&orders).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch orders"})
+		return
+	}
+
+	for _, order := range orders {
+		var food structs.Food
+		if err := tx.First(&food, order.FoodID).Error; err != nil {
+			tx.Rollback()
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch food item"})
+			return
+		}
+
+		if food.Quantity < order.Quantity {
+			tx.Rollback()
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Not enough stock for food item"})
+			return
+		}
+
+		newQuantity := food.Quantity - order.Quantity
+		if err := tx.Model(&food).Update("quantity", newQuantity).Error; err != nil {
+			tx.Rollback()
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update food quantity"})
+			return
+		}
+
+		if err := tx.Model(&order).Update("status", true).Error; err != nil {
+			tx.Rollback()
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update order status"})
+			return
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction commit failed"})
+		return
+	}
+
+	redirect := fmt.Sprintf("/profile/%s", userID)
+	c.Redirect(http.StatusFound, redirect)
+}
 
 func AddProduct(c *gin.Context) {
 	var Values struct {

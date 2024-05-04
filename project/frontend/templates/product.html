@@ -37,7 +37,7 @@
               <a href="/profile/{{ $userID }}">
                 <button>
                   {{ range $order := .orders }}
-                    {{ if eq $order.UserID $userID}}
+                    {{ if eq $order.UserID $userID }}
                       <span class="mention"></span>
                       {{ break }}
                     {{ end }}
