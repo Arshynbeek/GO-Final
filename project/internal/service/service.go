@@ -29,6 +29,8 @@ func Router() *gin.Engine {
 	router.GET("/edit-product/:id", OptionalAuthMiddleware(), EditProductPage)
 	router.GET("/new-product/", AuthMiddleware(), NewProductPage)
 
+	router.GET("/report/", AuthMiddleware(), AdminMiddleware(), ReportPage)
+
 	router.Static("/static", "../../frontend/public")
 
 	api.SetupAPIRoutes(router)
@@ -282,6 +284,29 @@ func EditProductPage(c *gin.Context) {
 	})
 }
 
+func ReportPage(c *gin.Context) {
+	sales, err1 := api.SaleReports()
+	inventory, err2 := api.InventoryReports()
+	preferences, err3 := api.PreferenceReports()
+	revenue, err4 := api.RevenueReports()
+
+	if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Failed to fetch reports: \n" + err1.Error() + "\n" + err2.Error() + "\n" + err3.Error() + "\n" + err4.Error(),
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "report.html", gin.H{
+		"title":       "Reports",
+		"sales":       sales,
+		"inventory":   inventory,
+		"preferences": preferences,
+		"revenue":     revenue,
+	})
+}
+
 func SignUpPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "signup.html", gin.H{
 		"title": "Sign Up",
@@ -320,6 +345,33 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.HTML(http.StatusUnauthorized, "error.html", gin.H{
 				"status": http.StatusUnauthorized,
 				"error":  "Invalid token",
+			})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func AdminMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userID, _ := c.Get("userID")
+
+		var user structs.User
+		if err := server.DB.First(&user, userID).Error; err != nil {
+			c.HTML(http.StatusUnauthorized, "error.html", gin.H{
+				"status": http.StatusUnauthorized,
+				"error":  "User not found",
+			})
+			c.Abort()
+			return
+		}
+
+		if !user.Admin {
+			c.HTML(http.StatusForbidden, "error.html", gin.H{
+				"status": http.StatusForbidden,
+				"error":  "Access denied - You do not have permission to access this page",
 			})
 			c.Abort()
 			return

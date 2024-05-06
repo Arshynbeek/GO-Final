@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+
+    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/styles/pages/report.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>Report Dashboard</h2>
+
+      <div class="sales">
+        <h3>Sales Reports</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Total Sold</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .sales }}
+            <tr>
+              <td>{{ .Date }}</td>
+              <td>{{ .TotalSold }}</td>
+              <td>{{ .Revenue }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="inventory">
+        <h3>Inventory Reports</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .inventory }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .Quantity }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="preferences">
+        <h3>Preference Reports</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Average Rating</th>
+              <th>Order Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .preferences }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .AverageRating }}</td>
+              <td>{{ .OrderCount }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="revenue">
+        <h3>Revenue Reports</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Category Name</th>
+              <th>Total Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .revenue }}
+            <tr>
+              <td>{{ .CategoryName }}</td>
+              <td>{{ .TotalRevenue }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+      
+    </div>
+  </body>
+
+</html>

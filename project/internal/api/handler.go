@@ -31,6 +31,11 @@ func SetupAPIRoutes(router *gin.Engine) {
 	router.POST("/api/v1/edit-product/", EditProduct)
 
 	router.POST("/api/v1/feedback/", Feedback)
+
+	// router.GET("/api/v1/reports/sales/", SaleReports)
+	// router.GET("/api/v1/reports/inventory/", InventoryReports)
+	// router.GET("/api/v1/reports/preferences/", PreferenceReports)
+	// router.GET("/api/v1/reports/revenue/", RevenueReports)
 }
 
 func SignUp(c *gin.Context) {
@@ -599,4 +604,99 @@ func Feedback(c *gin.Context) {
 
 	redirect := fmt.Sprintf("/product/%d", Values.FoodID)
 	c.Redirect(http.StatusFound, redirect)
+}
+
+func SaleReports() ([]struct {
+	Date      time.Time `json:"Date"`
+	TotalSold int       `json:"Total Sold"`
+	Revenue   int       `json:"Revenue"`
+}, error) {
+	var results []struct {
+		Date      time.Time `json:"Date"`
+		TotalSold int       `json:"Total Sold"`
+		Revenue   int       `json:"Revenue"`
+	}
+	startDate := time.Now().AddDate(0, 0, -1)
+	endDate := time.Now()
+	err := server.DB.Raw(`
+			SELECT DATE_TRUNC('day', orders.created_at) AS date, SUM(orders.quantity) AS total_sold, SUM(orders.quantity * foods.price) AS revenue
+			FROM orders
+			JOIN foods ON foods.id = orders.food_id
+			WHERE orders.created_at BETWEEN ? AND ? AND orders.status = true
+			GROUP BY DATE_TRUNC('day', orders.created_at)`,
+		startDate, endDate).Scan(&results).Error
+	return results, err
+}
+
+func InventoryReports() ([]struct {
+	Name     string `json:"Name"`
+	Quantity int    `json:"Quantity"`
+}, error) {
+	var results []struct {
+		Name     string `json:"Name"`
+		Quantity int    `json:"Quantity"`
+	}
+
+	err := server.DB.Raw(`SELECT name, quantity FROM foods`).Scan(&results).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func PreferenceReports() ([]struct {
+	Name          string  `json:"Name"`
+	AverageRating float64 `json:"Average Rating"`
+	OrderCount    int     `json:"Order Count"`
+}, error) {
+	var results []struct {
+		Name          string  `json:"Name"`
+		AverageRating float64 `json:"Average Rating"`
+		OrderCount    int     `json:"Order Count"`
+	}
+
+	startDate := time.Now().AddDate(0, 0, -1)
+	endDate := time.Now()
+
+	err := server.DB.Raw(`
+			SELECT foods.name, AVG(feedbacks.rating) AS average_rating, COUNT(orders.id) AS order_count
+			FROM foods
+			JOIN feedbacks ON foods.id = feedbacks.food_id
+			JOIN orders ON foods.id = orders.food_id
+			WHERE orders.created_at BETWEEN ? AND ?
+			GROUP BY foods.name;`,
+		startDate, endDate).Scan(&results).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func RevenueReports() ([]struct {
+	CategoryName string `json:"Category Name"`
+	TotalRevenue int    `json:"Total Revenue"`
+}, error) {
+	var results []struct {
+		CategoryName string `json:"Category Name"`
+		TotalRevenue int    `json:"Total Revenue"`
+	}
+
+	startDate := time.Now().AddDate(0, 0, -1)
+	endDate := time.Now()
+
+	err := server.DB.Raw(`
+			SELECT categories.name AS category_name, SUM(orders.quantity * foods.price) AS total_revenue
+			FROM categories
+			JOIN foods ON foods.category_id = categories.id
+			JOIN orders ON foods.id = orders.food_id
+			WHERE orders.created_at BETWEEN ? AND ?
+			GROUP BY categories.name;`,
+		startDate, endDate).Scan(&results).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
