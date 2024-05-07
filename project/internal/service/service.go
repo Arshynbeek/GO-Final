@@ -15,7 +15,7 @@ import (
 
 func Router() *gin.Engine {
 	router := gin.Default()
-	router.LoadHTMLGlob("../../frontend/templates/*.html")
+	router.LoadHTMLGlob("/root/templates/*.html")
 
 	router.GET("/", OptionalAuthMiddleware(), HomePage)
 
@@ -33,7 +33,7 @@ func Router() *gin.Engine {
 
 	router.GET("/about/", AboutPage)
 
-	router.Static("/static", "../../frontend/public")
+	router.Static("/static", "/root/public")
 
 	api.SetupAPIRoutes(router)
 

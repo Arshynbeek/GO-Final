@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -15,18 +16,26 @@ var DB *gorm.DB
 var ERR error
 
 func ConnectDB(connection string) (*gorm.DB, error) {
-	DB, ERR := gorm.Open(postgres.Open(connection), &gorm.Config{})
+	var db *gorm.DB
+	for i := 0; i < 10; i++ {
+		db, ERR = gorm.Open(postgres.Open(connection), &gorm.Config{})
+		if ERR == nil {
+			break
+		}
+		log.Printf("Database RUIN failed: %v, retrying...", ERR)
+		time.Sleep(5 * time.Second)
+	}
 	if ERR != nil {
 		return nil, ERR
 	}
 
-	ERR = DB.AutoMigrate(&structs.User{}, &structs.Category{}, &structs.Food{}, &structs.Order{}, &structs.Feedback{})
+	ERR = db.AutoMigrate(&structs.User{}, &structs.Category{}, &structs.Food{}, &structs.Order{}, &structs.Feedback{})
 	if ERR != nil {
 		log.Fatalf("Failed to migrate database: %v", ERR)
 	}
 
-	utils.Initialize(DB)
+	utils.Initialize(db)
 
-	fmt.Println("database RUIN was successful!")
-	return DB, nil
+	fmt.Println("Database RUIN was successful!")
+	return db, nil
 }

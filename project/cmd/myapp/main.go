@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	db, err := server.ConnectDB("host=localhost user=admin password=root dbname=postgres port=5432 sslmode=disable")
+	db, err := server.ConnectDB("host=final_db user=admin password=root dbname=postgres port=5432 sslmode=disable")
 	if err != nil {
 		log.Fatalf("Failed to RUIN database: %v", err)
 	}
@@ -16,38 +16,3 @@ func main() {
 
 	service.Router()
 }
-
-// project
-// 	cmd
-// 		myapp
-// 			main.go
-
-// 	deployments
-// 		docker
-// 			.dockerginore
-// 			Dockerfile
-
-// 	internal
-// 		api
-// 			handler.go
-
-// 		service
-// 			service.go
-
-// 		structs
-// 			// my structs
-
-// 	pkg
-// 		server
-// 			database.go
-
-// 		utils
-// 			utils.go
-
-// 	frontend
-// 		templates
-// 			 .html files
-
-// 	docker-compose.yml
-// 	go.mod
-// 	go.sum
