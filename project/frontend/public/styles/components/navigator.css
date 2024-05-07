@@ -46,6 +46,12 @@ nav {
               padding: 6px 0;
             }
           }
+
+          form {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+          }
         }
 
         button {

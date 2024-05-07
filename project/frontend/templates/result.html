@@ -4,10 +4,10 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .title }}</title>
+    <title>Results</title>
 
-    <link rel="stylesheet" href="/static/main.css" />
-    <link rel="stylesheet" href="/static/styles/pages/home.css" />
+    <link rel="stylesheet" href="/static/main.css">
+    <link rel="stylesheet" href="/static/styles/pages/result.css">
   </head>
 
   <body>
@@ -100,55 +100,7 @@
     </nav>
 
     <div class="container">
-      <div class="carousel">
-        {{ range $food := .foods }}
-          <div class="food">
-            <div class="image">
-              {{ range $picture := $food.Pictures }}
-                <img src="{{ $picture }}" alt="Food image" />
-              {{ end }}
-            </div>
-
-            <div class="content">
-              {{ range $.categories }}
-                {{ if eq .ID $food.CategoryID }}
-                  <strong>{{ .Name }}</strong>
-                {{ end }}
-              {{ end }}
-
-              <a href="/product/{{ $food.ID }}">
-                <h4>{{ $food.Name }}</h4>
-              </a>
-
-              {{ if $.user.Admin }}
-                <a href="/edit-product/{{ $food.ID }}">
-                  <button class="button button-neutral">
-                    <img src="/static/images/icons/edit_write_pen_icon.svg" alt="Edit">
-                    Edit Product
-                  </button>
-                </a>
-              {{ else if $userID }}
-                  <button class="button" onclick="AddToCart('{{ $food.ID }}', '{{ $food.Name }}')">
-                    <img src="/static/images/icons/shopping_cart_icon.svg" alt="Add">
-                    Add to cart
-                  </button>
-              {{ else }}
-                <button class="button" disabled>
-                  <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
-                  Add to cart
-                </button>
-              {{ end }}
-            </div>
-          </div>
-        {{ end }}
-
-        <div class="dots">
-          {{ range $index, $food := .foods }}
-            <span class="dot" data-index="{{ $index }}"></span>
-          {{ end }}
-        </div>
-      </div>
-
+      <h2>Results for: {{ .query }}</h2>
       {{ range $category := .categories }}
         <div class="products-block">
           <h2>{{ $category.Name }}</h2>

@@ -31,6 +31,8 @@ func Router() *gin.Engine {
 
 	router.GET("/report/", AuthMiddleware(), AdminMiddleware(), ReportPage)
 
+	router.GET("/about/", AboutPage)
+
 	router.Static("/static", "../../frontend/public")
 
 	api.SetupAPIRoutes(router)
@@ -304,6 +306,12 @@ func ReportPage(c *gin.Context) {
 		"inventory":   inventory,
 		"preferences": preferences,
 		"revenue":     revenue,
+	})
+}
+
+func AboutPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "about.html", gin.H{
+		"title": "About US",
 	})
 }
 

@@ -1,0 +1,58 @@
+.block {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+
+  > div {
+    cursor: pointer;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: ease-in 0.1s;
+    transition: ease-out 0.3s;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .content {
+      display: none;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      .content {
+        display: flex;
+      }
+    }
+  }
+}
+
+.content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 100px;
+  flex-direction: column;
+  justify-content: end;
+  background: rgb(0,0,0);
+  background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(255,255,255,0) 60%);
+
+  h2, p {
+    color: var(--white);
+  }
+}
+
+button {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 10px;
+}

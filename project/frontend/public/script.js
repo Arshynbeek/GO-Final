@@ -40,8 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (open) {
       document.querySelector(".menu-bar").style.display = "none";
       document.querySelector(".menu-close").style.display = "block";
-      document.querySelector(".container").style.marginLeft = "350px";
-      document.querySelectorAll(".menu-open").forEach(e => e.style.display = "block");
+      document.querySelector(".container").style.marginLeft = "400px";
+      document.querySelectorAll(".menu-open").forEach(e => e.style.display = "flex");
       open = !open;
     } else {
       document.querySelector(".menu-bar").style.display = "block";

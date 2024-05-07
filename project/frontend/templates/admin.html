@@ -21,7 +21,13 @@
                 <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu" class="menu-bar">
                 <img src="/static/images/icons/x_icon.svg" alt="close" class="menu-close">
               </button>
-              <input class="menu-open" type="search" placeholder=">_ Search">
+
+              <form action="/api/v1/search/" method="GET" class="menu-open">
+                <input type="search" name="query" placeholder=">_ Search">
+                <button type="submit" class="button">
+                  <img src="/static/images/icons/search_icon.svg" alt="Search">
+                </button>
+              </form>
             </li>
 
             <li>
@@ -53,7 +59,7 @@
         <li>
           <ul>
             <li>
-              <a href="" class="link">
+              <a href="/about/" class="link">
                 <button>
                   <img src="/static/images/icons/info_information_icon.svg" alt="">
                 </button>
@@ -62,11 +68,11 @@
             </li>
 
             <li>
-              <a href="" class="link">
+              <a href="/report/" class="link">
                 <button>
                   <img src="/static/images/icons/settings_icon.svg" alt="">
                 </button>
-                <strong class="menu-open">Settings</strong>
+                <strong class="menu-open">Reports</strong>
               </a>
             </li>
 

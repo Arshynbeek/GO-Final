@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .food.Name }}</title>
     
-    <link rel="stylesheet" href="/static/main.css">
-    <link rel="stylesheet" href="/static/styles/pages/product.css">
+    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/styles/pages/product.css" />
   </head>
 
   <body>
@@ -18,23 +18,30 @@
         <li>
           <ul>
             <li>
-              <a href="">
-                <button>
-                  <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu">
+              <button class="menu">
+                <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu" class="menu-bar">
+                <img src="/static/images/icons/x_icon.svg" alt="close" class="menu-close">
+              </button>
+
+              <form action="/api/v1/search/" method="GET" class="menu-open">
+                <input type="search" name="query" placeholder=">_ Search">
+                <button type="submit" class="button">
+                  <img src="/static/images/icons/search_icon.svg" alt="Search">
                 </button>
-              </a>
+              </form>
             </li>
 
             <li>
-              <a href="/">
+              <a href="/" class="link">
                 <button>
                   <img src="/static/images/icons/home_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Home</strong>
               </a>
             </li>
 
             <li>
-              <a href="/profile/{{ $userID }}">
+              <a href="/profile/{{ $userID }}" class="link">
                 <button>
                   {{ range $order := .orders }}
                     {{ if eq $order.UserID $userID }}
@@ -44,6 +51,7 @@
                   {{ end }}
                   <img src="/static/images/icons/bell_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Notifications</strong>
               </a>
             </li>
           </ul>
@@ -52,33 +60,37 @@
         <li>
           <ul>
             <li>
-              <a href="">
+              <a href="/about/" class="link">
                 <button>
                   <img src="/static/images/icons/info_information_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Info</strong>
               </a>
             </li>
 
             <li>
-              <a href="">
+              <a href="/report/" class="link">
                 <button>
                   <img src="/static/images/icons/settings_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Reports</strong>
               </a>
             </li>
 
             <li>
               {{ if $userID }}
-                <a href="/profile/{{ $userID }}">
+                <a href="/profile/{{ $userID }}" class="link">
                   <button>
                     <img src="/static/images/icons/user_icon.svg" alt="">
                   </button>
+                  <strong class="menu-open">Profile</strong>
                 </a>
               {{ else }}
-                <a href="/signin/">
+                <a href="/signin/" class="link">
                   <button>
                     <img src="/static/images/icons/log_in_icon.svg" alt="">
                   </button>
+                  <strong class="menu-open">Sign In</strong>
                 </a>
               {{ end }}
             </li>
@@ -196,6 +208,7 @@
                   
                   <div>
                     <small>Quantity: <strong>{{ $product.Quantity }}</strong></small>
+
                     <span>
                       {{ if $.user.Admin }}
                         <a href="/edit-product/{{ $product.ID }}">
@@ -205,14 +218,10 @@
                           </button>
                         </a>
                       {{ else if $userID }}
-                        <form action="/api/v1/add/" method="POST">
-                          <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}">
-                          <input type="hidden" name="FoodID" id="FoodID" value="{{ $product.ID }}">
-                          <button class="button" type="submit">
-                            <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
-                            Add to cart
-                          </button>
-                        </form>
+                        <button class="button" onclick="AddToCart('{{ $product.ID }}', '{{ $product.Name }}', '{{ $userID }}')">
+                          <img src="/static/images/icons/shopping_cart_icon.svg" alt="Add">
+                          Add to cart
+                        </button>
                       {{ else }}
                         <button class="button" disabled>
                           <img src="/static/images/icons/shopping_cart_icon.svg" alt="">
@@ -235,5 +244,64 @@
         </div>
       </div>
     </div>
+
+    <div id="product-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2 id="product-title">Add Product to Cart</h2>
+        <p>Select the quantity: <strong id="product-quantity">1</strong></p>
+
+        <div class="modal-action">
+          <button onclick="Quantity(-1)" class="button-neutral">&#8722;</button>
+          <button onclick="Quantity(+1)" class="button-neutral">&#43;</button>
+        </div>
+
+        <form action="/api/v1/add/" method="POST">
+          <input type="hidden" name="FoodID" id="FoodID" />
+          <input type="hidden" name="UserID" id="UserID" value="{{ $userID }}" />
+          <input type="hidden" name="Quantity" id="Quantity" value="1" />
+          <button type="submit" class="button">
+            <img src="/static/images/icons/shopping_cart_icon.svg" alt="Add">
+            Add to Cart
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      var modal = document.getElementById("product-modal");
+      var span = document.getElementsByClassName("modal-close")[0];
+      var quantity = document.getElementById("product-quantity");
+
+      function AddToCart(foodID, foodName) {
+        document.getElementById("FoodID").value = foodID;
+        document.getElementById("product-title").textContent = `Add ${foodName} to Cart`;
+        modal.style.display = "block";
+      }
+
+      function Quantity(n) {
+        if (n === -1) {
+          if (parseInt(quantity.innerHTML) > 1) {
+            quantity.innerHTML = parseInt(quantity.innerHTML) + n;
+          }
+        } else {
+          quantity.innerHTML = parseInt(quantity.innerHTML) + n;
+        }
+
+        document.getElementById("Quantity").value = quantity.innerHTML;
+      }
+
+      span.onclick = function () {
+        modal.style.display = "none";
+      }
+
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    </script>
+
+    <script src="/static/script.js"></script>
   </body>
 </html>

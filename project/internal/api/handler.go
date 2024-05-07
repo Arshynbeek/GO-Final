@@ -32,6 +32,8 @@ func SetupAPIRoutes(router *gin.Engine) {
 
 	router.POST("/api/v1/feedback/", Feedback)
 
+	router.GET("/api/v1/search/", SearchProduct)
+
 	// router.GET("/api/v1/reports/sales/", SaleReports)
 	// router.GET("/api/v1/reports/inventory/", InventoryReports)
 	// router.GET("/api/v1/reports/preferences/", PreferenceReports)
@@ -604,6 +606,59 @@ func Feedback(c *gin.Context) {
 
 	redirect := fmt.Sprintf("/product/%d", Values.FoodID)
 	c.Redirect(http.StatusFound, redirect)
+}
+
+func SearchProduct(c *gin.Context) {
+	query := c.Query("query")
+	if query == "" {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"status": http.StatusBadRequest,
+			"error":  "Query parameter is required",
+		})
+		return
+	}
+
+	var foods []structs.Food
+	result := server.DB.Where("name ILIKE ?", "%"+query+"%").Find(&foods)
+	if result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  "Food not found: " + result.Error.Error(),
+		})
+		return
+	}
+
+	var categories []structs.Category
+	if result := server.DB.Find(&categories); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
+		return
+	}
+
+	var orders []structs.Order
+	if result := server.DB.Find(&orders); result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  result.Error.Error(),
+		})
+		return
+	}
+
+	user, exists := c.Get("userID")
+	var data structs.User
+	if exists {
+		server.DB.First(&data, user)
+	}
+
+	c.HTML(http.StatusFound, "result.html", gin.H{
+		"query":      query,
+		"foods":      foods,
+		"orders":     orders,
+		"categories": categories,
+		"user":       data,
+	})
 }
 
 func SaleReports() ([]struct {

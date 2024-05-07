@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .user.Name }}</title>
 
-    <link rel="stylesheet" href="/static/main.css">
-    <link rel="stylesheet" href="/static/styles/pages/profile.css">
+    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/styles/pages/profile.css" />
   </head>
 
   <body>
@@ -18,23 +18,30 @@
         <li>
           <ul>
             <li>
-              <a href="">
-                <button>
-                  <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu">
+              <button class="menu">
+                <img src="/static/images/icons/menu_navigation_icon.svg" alt="menu" class="menu-bar">
+                <img src="/static/images/icons/x_icon.svg" alt="close" class="menu-close">
+              </button>
+
+              <form action="/api/v1/search/" method="GET" class="menu-open">
+                <input type="search" name="query" placeholder=">_ Search">
+                <button type="submit" class="button">
+                  <img src="/static/images/icons/search_icon.svg" alt="Search">
                 </button>
-              </a>
+              </form>
             </li>
 
             <li>
-              <a href="/">
+              <a href="/" class="link">
                 <button>
                   <img src="/static/images/icons/home_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Home</strong>
               </a>
             </li>
 
             <li>
-              <a href="/profile/{{ $userID }}">
+              <a href="/profile/{{ $userID }}" class="link">
                 <button>
                   {{ range $order := .orders }}
                     {{ if eq $order.UserID $userID }}
@@ -44,6 +51,7 @@
                   {{ end }}
                   <img src="/static/images/icons/bell_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Notifications</strong>
               </a>
             </li>
           </ul>
@@ -52,33 +60,37 @@
         <li>
           <ul>
             <li>
-              <a href="">
+              <a href="/about/" class="link">
                 <button>
                   <img src="/static/images/icons/info_information_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Info</strong>
               </a>
             </li>
 
             <li>
-              <a href="">
+              <a href="/report/" class="link">
                 <button>
                   <img src="/static/images/icons/settings_icon.svg" alt="">
                 </button>
+                <strong class="menu-open">Reports</strong>
               </a>
             </li>
 
             <li>
               {{ if $userID }}
-                <a href="/profile/{{ $userID }}">
+                <a href="/profile/{{ $userID }}" class="link">
                   <button>
                     <img src="/static/images/icons/user_icon.svg" alt="">
                   </button>
+                  <strong class="menu-open">Profile</strong>
                 </a>
               {{ else }}
-                <a href="/signin/">
+                <a href="/signin/" class="link">
                   <button>
                     <img src="/static/images/icons/log_in_icon.svg" alt="">
                   </button>
+                  <strong class="menu-open">Sign In</strong>
                 </a>
               {{ end }}
             </li>
@@ -307,6 +319,8 @@
         updateTotalPrices();
       });
     </script>
+
+  <script src="/static/script.js"></script>
 
   </body>
 
