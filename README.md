@@ -1,7 +1,7 @@
 # University Canteen Management System
 
 ## Overview
-This project is structured as a full-stack Go application, integrating frontend and backend services, and designed to be containerized using Docker. It employs a modular architecture with separation of concerns among user interface, API layer, business logic, and utility functions.
+The project entails the development of an extensive university cafeteria management system utilizing the Go programming language. This system will explore multiple facets of software development in Go, including an introduction to Go's syntax, Docker, interaction with Go databases, and API integration, the creation of web applications using Go
 
 ## Project Structure
 
@@ -78,4 +78,3 @@ This command builds the application as defined in the `Dockerfile` and `docker-c
 
 ## Usage
 After launching the application, you can access the web interface through your browser at `http://localhost:[port]`. Replace `[port]` with the actual port number configured in the Docker or Go settings.
-(in this case: http://localhost:2024).
