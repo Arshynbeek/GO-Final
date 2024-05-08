@@ -29,8 +29,11 @@ This project is structured as a full-stack Go application, integrating frontend 
 - Go (version specified in `go.mod`)
 
 ### Running the Application
-1. Clone the repository: `git clone https://github.com/Arshynbeek/GO-Final.git`
+1. Clone the repository: 
+  ```git clone https://github.com/Arshynbeek/GO-Final.git`
 
-2. Navigate to the project directory: `cd cd GO-Final`
+2. Navigate to the project directory: 
+  ```cd cd GO-Final`
 
-3. Build and run the Docker containers: `docker-compose up --build`
+3. Build and run the Docker containers: 
+  ```docker-compose up --build`
