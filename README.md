@@ -36,10 +36,15 @@ This project is structured as a full-stack Go application, integrating frontend 
 
 2. Navigate to the project directory: 
   ```bash
-  cd cd GO-Final
+  cd GO-Final
   ```
 
 3. Build and run the Docker containers: 
   ```bash
   docker-compose up --build
   ```
+
+This command builds the application as defined in the `Dockerfile` and `docker-compose.yml`, and runs it along with its dependencies.
+
+## Usage
+After launching the application, you can access the web interface through your browser at `http://localhost:[port]`. Replace `[port]` with the actual port number configured in the Docker or Go settings (in this case: http://localhost:2024).
